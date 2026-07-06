@@ -4,11 +4,12 @@ export const Route = createFileRoute("/api/paste")({
 	server: {
 		handlers: {
 			GET: async ({ request }) => {
-				const { sessionUser } = await import("@/server/auth");
+				const { dbConfigured, sessionUser } = await import("@/server/auth");
+				if (!dbConfigured) return dbMissing();
 				const user = await sessionUser(request);
 				if (!user) return new Response("Sign in required", { status: 401 });
 				const { listPastes } = await import("@/server/pastes");
-				return Response.json(listPastes(user.id));
+				return Response.json(await listPastes(user.id));
 			},
 			POST: async ({ request }) => {
 				const { maxPasteBytes, rateLimit, tooLarge } = await import(
@@ -18,7 +19,8 @@ export const Route = createFileRoute("/api/paste")({
 					rateLimit(request, "paste", 10) ??
 					tooLarge(request, maxPasteBytes + 4096);
 				if (limited) return limited;
-				const { sessionUser } = await import("@/server/auth");
+				const { dbConfigured, sessionUser } = await import("@/server/auth");
+				if (!dbConfigured) return dbMissing();
 				const user = await sessionUser(request);
 				if (!user) return new Response("Sign in required", { status: 401 });
 				let body: Record<string, unknown>;
@@ -60,7 +62,7 @@ export const Route = createFileRoute("/api/paste")({
 					body.visibility === "private" ? "private" : "unlisted";
 				const expiry = typeof body.expiry === "string" ? body.expiry : "7d";
 				const { createPaste } = await import("@/server/pastes");
-				const id = createPaste({
+				const id = await createPaste({
 					userId: user.id,
 					name,
 					description,
@@ -75,3 +77,10 @@ export const Route = createFileRoute("/api/paste")({
 		},
 	},
 });
+
+function dbMissing(): Response {
+	return new Response(
+		"The pastebin requires a database — set DATABASE_URL to your Supabase connection string",
+		{ status: 503 },
+	);
+}

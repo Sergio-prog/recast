@@ -1,5 +1,5 @@
 services:
-  ultra-convert:
+  recast:
     build: .
     ports:
       - "3000:3000"
@@ -12,9 +12,4 @@ services:
       MAX_DOWNLOAD_MB: ${MAX_DOWNLOAD_MB:-500}
       PASTE_MAX_KB: ${PASTE_MAX_KB:-256}
       TRUST_PROXY: ${TRUST_PROXY:-0}
-    volumes:
-      - ultra-data:/data
     restart: unless-stopped
-
-volumes:
-  ultra-data:

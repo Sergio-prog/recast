@@ -26,9 +26,7 @@ RUN bun install --frozen-lockfile --production
 COPY --from=build /app/dist ./dist
 ENV NODE_ENV=production \
 	PORT=3000 \
-	DATA_DIR=/data \
 	CHROMIUM_PATH=/usr/bin/chromium \
 	CHROMIUM_NO_SANDBOX=1
-VOLUME /data
 EXPOSE 3000
 CMD ["bun", "server.mjs"]
