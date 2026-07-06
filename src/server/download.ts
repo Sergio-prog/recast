@@ -47,10 +47,14 @@ export async function downloadToResponse(
 						"--merge-output-format",
 						"mp4",
 					];
+		const { maxDownloadMb } = await import("./limits");
+		const sizeArgs =
+			maxDownloadMb > 0 ? ["--max-filesize", `${maxDownloadMb}M`] : [];
 		await run(
 			YTDLP,
 			[
 				...modeArgs,
+				...sizeArgs,
 				"--no-playlist",
 				"--no-warnings",
 				"-o",
@@ -67,7 +71,7 @@ export async function downloadToResponse(
 		file.once("close", () => {
 			void rm(dir, { recursive: true, force: true });
 		});
-		return new Response(Readable.toWeb(file) as ReadableStream, {
+		return new Response(Readable.toWeb(file) as unknown as ReadableStream, {
 			headers: {
 				"content-type": mode === "audio" ? "audio/mpeg" : "video/mp4",
 				"content-length": String(size),

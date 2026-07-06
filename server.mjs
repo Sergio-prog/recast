@@ -6,7 +6,7 @@ const port = Number(process.env.PORT ?? 3000);
 Bun.serve({
 	port,
 	idleTimeout: 240,
-	async fetch(request) {
+	async fetch(request, server) {
 		const { pathname } = new URL(request.url);
 		if (pathname !== "/" && !pathname.includes("..")) {
 			const file = Bun.file(clientDir + pathname);
@@ -19,6 +19,12 @@ Bun.serve({
 					},
 				});
 			}
+		}
+		const ip = server.requestIP(request)?.address;
+		if (ip) {
+			const headers = new Headers(request.headers);
+			headers.set("x-client-ip", ip);
+			return handler.fetch(new Request(request, { headers }));
 		}
 		return handler.fetch(request);
 	},

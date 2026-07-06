@@ -7,6 +7,9 @@ export const Route = createFileRoute("/api/currency")({
 	server: {
 		handlers: {
 			GET: async ({ request }) => {
+				const { rateLimit } = await import("@/server/limits");
+				const limited = rateLimit(request, "currency", 60);
+				if (limited) return limited;
 				const base = (
 					new URL(request.url).searchParams.get("base") ?? "USD"
 				).toUpperCase();

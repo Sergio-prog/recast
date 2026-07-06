@@ -4,13 +4,19 @@ export const Route = createFileRoute("/api/download")({
 	server: {
 		handlers: {
 			GET: async ({ request }) => {
+				const { blockedUrl, rateLimit } = await import("@/server/limits");
 				const params = new URL(request.url).searchParams;
 				const url = params.get("url") ?? "";
-				if (!/^https?:\/\//i.test(url)) {
-					return new Response("Provide a valid http(s) URL", { status: 400 });
-				}
+				const isFile = params.get("action") === "file";
+				const limited =
+					rateLimit(
+						request,
+						isFile ? "download" : "download-info",
+						isFile ? 6 : 15,
+					) ?? blockedUrl(url);
+				if (limited) return limited;
 				try {
-					if (params.get("action") === "file") {
+					if (isFile) {
 						const { downloadToResponse } = await import("@/server/download");
 						const mode = params.get("mode") === "audio" ? "audio" : "video";
 						return await downloadToResponse(url, mode);
