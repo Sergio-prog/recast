@@ -12,6 +12,11 @@
 </p>
 
 <p align="center">
+  <code>convert</code> · <code>pdf</code> · <code>paste</code> · <code>screenshot</code> ·
+  <code>dig</code> · <code>ip</code> · <code>speed</code> · <code>download</code> · <code>currency</code>
+</p>
+
+<p align="center">
   <a href="https://recast.serhiifotex.dev">recast.serhiifotex.dev</a> ·
   <a href="VISION.md">vision</a> ·
   <a href="ROADMAP.md">roadmap</a>
@@ -23,10 +28,12 @@
   <img src="https://img.shields.io/badge/framework-TanStack%20Start-10b981.svg" alt="TanStack Start" />
 </p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/screenshot-dark.png" />
-  <img src=".github/screenshot-light.png" alt="Recast workbench" />
-</picture>
+<a href="https://recast.serhiifotex.dev">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/screenshot-dark.png" />
+    <img src=".github/screenshot-light.png" alt="Recast workbench — drop any mix of files, pick a target per file" />
+  </picture>
+</a>
 
 ## Tools
 
@@ -51,22 +58,42 @@
 - **Download** — video (MP4) or audio (MP3) from YouTube, SoundCloud and 1,800+ sites
 - **Currency** — 160+ currencies with daily rates, cached server-side
 
-## How it works
+## A look around
 
-| Engine | Used for |
-| --- | --- |
-| [sharp](https://sharp.pixelplumbing.com) | raster images (HEIC via `sips` on macOS, `heif-convert` on Linux) |
-| [FFmpeg](https://ffmpeg.org) | video, audio, GIF, BMP bridging |
-| `bsdtar` | archive rewrites and ZIP packaging |
-| [pdf-lib](https://pdf-lib.js.org) + [pdf.js](https://mozilla.github.io/pdf.js/) | PDF assembly and rendering |
-| [playwright-core](https://playwright.dev) | website screenshots |
-| [yt-dlp](https://github.com/yt-dlp/yt-dlp) | media downloads |
-| [better-auth](https://better-auth.com) + [Supabase](https://supabase.com) Postgres | Google sign-in and paste storage |
-| `node:dns` + [rdap.org](https://rdap.org) | DNS dig and registrar data |
-| [ipwho.is](https://ipwho.is) / [open.er-api.com](https://www.exchangerate-api.com) | geo-IP and exchange rates |
-
-Everything runs through [TanStack Start](https://tanstack.com/start) server routes —
-no separate backend, and no third party ever touches your files.
+<table>
+  <tr>
+    <td width="50%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset=".github/dig-dark.png" />
+        <img src=".github/dig-light.png" alt="DNS dig with four resolvers and a propagation mismatch flagged" />
+      </picture>
+      <p align="center"><sub><b>DNS dig</b> — four resolvers at once, mismatches flagged, RDAP on the side</sub></p>
+    </td>
+    <td width="50%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset=".github/speed-dark.png" />
+        <img src=".github/speed-light.png" alt="Speed test results between browser and server" />
+      </picture>
+      <p align="center"><sub><b>Speed test</b> — ping, download and upload against your own server</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset=".github/currency-dark.png" />
+        <img src=".github/currency-light.png" alt="Currency converter with live rates" />
+      </picture>
+      <p align="center"><sub><b>Currency</b> — 160+ currencies, daily rates cached server-side</sub></p>
+    </td>
+    <td width="50%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset=".github/pdf-dark.png" />
+        <img src=".github/pdf-light.png" alt="PDF tools — merge, split and images to PDF" />
+      </picture>
+      <p align="center"><sub><b>PDF tools</b> — merge, split by ranges, bundle images into one document</sub></p>
+    </td>
+  </tr>
+</table>
 
 ## Getting started
 
@@ -78,12 +105,7 @@ bun run dev
 Open http://localhost:3000.
 
 Local requirements: [bun](https://bun.sh) ≥ 1.3, `ffmpeg` and `yt-dlp` on `PATH`
-(`brew install ffmpeg yt-dlp`), and `bsdtar` (preinstalled on macOS). For the
-screenshot tool, install a headless Chromium once:
-
-```sh
-bunx playwright-core install chromium-headless-shell
-```
+(`brew install ffmpeg yt-dlp`), and `bsdtar` (preinstalled on macOS).
 
 ### Database & Google sign-in (pastebin)
 
@@ -125,27 +147,6 @@ docker compose up --build
 
 The image bundles FFmpeg, yt-dlp, bsdtar, libheif and Chromium. Configure via
 `.env` (picked up by compose) — see [.env.example](.env.example).
-
-## Configuration
-
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `PORT` | `3000` | server port |
-| `DATABASE_URL` | unset | Supabase/Postgres connection string (pastebin + auth) |
-| `BETTER_AUTH_SECRET` | dev-only fallback | session signing secret — set a long random value |
-| `BETTER_AUTH_URL` | `http://localhost:3000` | public base URL for OAuth callbacks |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | unset | Google OAuth credentials (pastebin) |
-| `MAX_UPLOAD_MB` | `512` | request size limit for conversions |
-| `MAX_DOWNLOAD_MB` | `0` (off) | yt-dlp max file size |
-| `PASTE_MAX_KB` | `256` | paste content size limit |
-| `TRUST_PROXY` | `0` | set `1` behind a reverse proxy so rate limits use `x-forwarded-for` |
-| `FFMPEG_PATH` / `YTDLP_PATH` / `BSDTAR_PATH` | binary names | binary overrides |
-| `CHROMIUM_PATH` | playwright default | Chromium binary for screenshots |
-| `CHROMIUM_NO_SANDBOX` | `0` | set `1` when running Chromium as root (Docker) |
-
-Public-hosting hardening is built in: per-IP rate limits on every API route,
-upload/download/paste size caps, and private-network host blocking for the
-downloader and screenshot tools.
 
 ## Why
 
