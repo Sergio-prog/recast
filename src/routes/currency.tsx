@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/currency")({
-	head: () => ({ meta: [{ title: "Currency converter — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Currency converter — Recast" }] }),
 	component: CurrencyPage,
 });
 

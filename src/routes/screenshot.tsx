@@ -21,7 +21,7 @@ import { Slider } from "@/components/ui/slider";
 import { Spinner } from "@/components/ui/spinner";
 
 export const Route = createFileRoute("/screenshot")({
-	head: () => ({ meta: [{ title: "Website screenshot — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Website screenshot — Recast" }] }),
 	component: ScreenshotPage,
 });
 

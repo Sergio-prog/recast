@@ -10,19 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideoRouteImport } from './routes/video'
+import { Route as SpeedRouteImport } from './routes/speed'
 import { Route as ScreenshotRouteImport } from './routes/screenshot'
 import { Route as PdfRouteImport } from './routes/pdf'
+import { Route as IpRouteImport } from './routes/ip'
 import { Route as ImagesRouteImport } from './routes/images'
 import { Route as DownloadRouteImport } from './routes/download'
+import { Route as DigRouteImport } from './routes/dig'
 import { Route as CurrencyRouteImport } from './routes/currency'
 import { Route as AudioRouteImport } from './routes/audio'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PasteIndexRouteImport } from './routes/paste/index'
 import { Route as PasteIdRouteImport } from './routes/paste/$id'
+import { Route as ApiSpeedRouteImport } from './routes/api/speed'
 import { Route as ApiScreenshotRouteImport } from './routes/api/screenshot'
 import { Route as ApiPdfRouteImport } from './routes/api/pdf'
 import { Route as ApiPasteRouteImport } from './routes/api/paste'
+import { Route as ApiIpRouteImport } from './routes/api/ip'
 import { Route as ApiDownloadRouteImport } from './routes/api/download'
+import { Route as ApiDigRouteImport } from './routes/api/dig'
 import { Route as ApiCurrencyRouteImport } from './routes/api/currency'
 import { Route as ApiConvertRouteImport } from './routes/api/convert'
 import { Route as ApiPasteIdRouteImport } from './routes/api/paste.$id'
@@ -31,6 +37,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
   path: '/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeedRoute = SpeedRouteImport.update({
+  id: '/speed',
+  path: '/speed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScreenshotRoute = ScreenshotRouteImport.update({
@@ -43,6 +54,11 @@ const PdfRoute = PdfRouteImport.update({
   path: '/pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IpRoute = IpRouteImport.update({
+  id: '/ip',
+  path: '/ip',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ImagesRoute = ImagesRouteImport.update({
   id: '/images',
   path: '/images',
@@ -51,6 +67,11 @@ const ImagesRoute = ImagesRouteImport.update({
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DigRoute = DigRouteImport.update({
+  id: '/dig',
+  path: '/dig',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CurrencyRoute = CurrencyRouteImport.update({
@@ -78,6 +99,11 @@ const PasteIdRoute = PasteIdRouteImport.update({
   path: '/paste/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSpeedRoute = ApiSpeedRouteImport.update({
+  id: '/api/speed',
+  path: '/api/speed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiScreenshotRoute = ApiScreenshotRouteImport.update({
   id: '/api/screenshot',
   path: '/api/screenshot',
@@ -93,9 +119,19 @@ const ApiPasteRoute = ApiPasteRouteImport.update({
   path: '/api/paste',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiIpRoute = ApiIpRouteImport.update({
+  id: '/api/ip',
+  path: '/api/ip',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDownloadRoute = ApiDownloadRouteImport.update({
   id: '/api/download',
   path: '/api/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDigRoute = ApiDigRouteImport.update({
+  id: '/api/dig',
+  path: '/api/dig',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCurrencyRoute = ApiCurrencyRouteImport.update({
@@ -123,17 +159,23 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
+  '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
   '/images': typeof ImagesRoute
+  '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
   '/screenshot': typeof ScreenshotRoute
+  '/speed': typeof SpeedRoute
   '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
+  '/api/dig': typeof ApiDigRoute
   '/api/download': typeof ApiDownloadRoute
+  '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
   '/api/screenshot': typeof ApiScreenshotRoute
+  '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
   '/paste/': typeof PasteIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -143,17 +185,23 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
+  '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
   '/images': typeof ImagesRoute
+  '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
   '/screenshot': typeof ScreenshotRoute
+  '/speed': typeof SpeedRoute
   '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
+  '/api/dig': typeof ApiDigRoute
   '/api/download': typeof ApiDownloadRoute
+  '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
   '/api/screenshot': typeof ApiScreenshotRoute
+  '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
   '/paste': typeof PasteIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -164,17 +212,23 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
+  '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
   '/images': typeof ImagesRoute
+  '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
   '/screenshot': typeof ScreenshotRoute
+  '/speed': typeof SpeedRoute
   '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
+  '/api/dig': typeof ApiDigRoute
   '/api/download': typeof ApiDownloadRoute
+  '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
   '/api/screenshot': typeof ApiScreenshotRoute
+  '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
   '/paste/': typeof PasteIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -186,17 +240,23 @@ export interface FileRouteTypes {
     | '/'
     | '/audio'
     | '/currency'
+    | '/dig'
     | '/download'
     | '/images'
+    | '/ip'
     | '/pdf'
     | '/screenshot'
+    | '/speed'
     | '/video'
     | '/api/convert'
     | '/api/currency'
+    | '/api/dig'
     | '/api/download'
+    | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
     | '/api/screenshot'
+    | '/api/speed'
     | '/paste/$id'
     | '/paste/'
     | '/api/auth/$'
@@ -206,17 +266,23 @@ export interface FileRouteTypes {
     | '/'
     | '/audio'
     | '/currency'
+    | '/dig'
     | '/download'
     | '/images'
+    | '/ip'
     | '/pdf'
     | '/screenshot'
+    | '/speed'
     | '/video'
     | '/api/convert'
     | '/api/currency'
+    | '/api/dig'
     | '/api/download'
+    | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
     | '/api/screenshot'
+    | '/api/speed'
     | '/paste/$id'
     | '/paste'
     | '/api/auth/$'
@@ -226,17 +292,23 @@ export interface FileRouteTypes {
     | '/'
     | '/audio'
     | '/currency'
+    | '/dig'
     | '/download'
     | '/images'
+    | '/ip'
     | '/pdf'
     | '/screenshot'
+    | '/speed'
     | '/video'
     | '/api/convert'
     | '/api/currency'
+    | '/api/dig'
     | '/api/download'
+    | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
     | '/api/screenshot'
+    | '/api/speed'
     | '/paste/$id'
     | '/paste/'
     | '/api/auth/$'
@@ -247,17 +319,23 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AudioRoute: typeof AudioRoute
   CurrencyRoute: typeof CurrencyRoute
+  DigRoute: typeof DigRoute
   DownloadRoute: typeof DownloadRoute
   ImagesRoute: typeof ImagesRoute
+  IpRoute: typeof IpRoute
   PdfRoute: typeof PdfRoute
   ScreenshotRoute: typeof ScreenshotRoute
+  SpeedRoute: typeof SpeedRoute
   VideoRoute: typeof VideoRoute
   ApiConvertRoute: typeof ApiConvertRoute
   ApiCurrencyRoute: typeof ApiCurrencyRoute
+  ApiDigRoute: typeof ApiDigRoute
   ApiDownloadRoute: typeof ApiDownloadRoute
+  ApiIpRoute: typeof ApiIpRoute
   ApiPasteRoute: typeof ApiPasteRouteWithChildren
   ApiPdfRoute: typeof ApiPdfRoute
   ApiScreenshotRoute: typeof ApiScreenshotRoute
+  ApiSpeedRoute: typeof ApiSpeedRoute
   PasteIdRoute: typeof PasteIdRoute
   PasteIndexRoute: typeof PasteIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -270,6 +348,13 @@ declare module '@tanstack/react-router' {
       path: '/video'
       fullPath: '/video'
       preLoaderRoute: typeof VideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speed': {
+      id: '/speed'
+      path: '/speed'
+      fullPath: '/speed'
+      preLoaderRoute: typeof SpeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/screenshot': {
@@ -286,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ip': {
+      id: '/ip'
+      path: '/ip'
+      fullPath: '/ip'
+      preLoaderRoute: typeof IpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/images': {
       id: '/images'
       path: '/images'
@@ -298,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/download'
       fullPath: '/download'
       preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dig': {
+      id: '/dig'
+      path: '/dig'
+      fullPath: '/dig'
+      preLoaderRoute: typeof DigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/currency': {
@@ -335,6 +434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PasteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/speed': {
+      id: '/api/speed'
+      path: '/api/speed'
+      fullPath: '/api/speed'
+      preLoaderRoute: typeof ApiSpeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/screenshot': {
       id: '/api/screenshot'
       path: '/api/screenshot'
@@ -356,11 +462,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPasteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ip': {
+      id: '/api/ip'
+      path: '/api/ip'
+      fullPath: '/api/ip'
+      preLoaderRoute: typeof ApiIpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/download': {
       id: '/api/download'
       path: '/api/download'
       fullPath: '/api/download'
       preLoaderRoute: typeof ApiDownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dig': {
+      id: '/api/dig'
+      path: '/api/dig'
+      fullPath: '/api/dig'
+      preLoaderRoute: typeof ApiDigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/currency': {
@@ -410,17 +530,23 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AudioRoute: AudioRoute,
   CurrencyRoute: CurrencyRoute,
+  DigRoute: DigRoute,
   DownloadRoute: DownloadRoute,
   ImagesRoute: ImagesRoute,
+  IpRoute: IpRoute,
   PdfRoute: PdfRoute,
   ScreenshotRoute: ScreenshotRoute,
+  SpeedRoute: SpeedRoute,
   VideoRoute: VideoRoute,
   ApiConvertRoute: ApiConvertRoute,
   ApiCurrencyRoute: ApiCurrencyRoute,
+  ApiDigRoute: ApiDigRoute,
   ApiDownloadRoute: ApiDownloadRoute,
+  ApiIpRoute: ApiIpRoute,
   ApiPasteRoute: ApiPasteRouteWithChildren,
   ApiPdfRoute: ApiPdfRoute,
   ApiScreenshotRoute: ApiScreenshotRoute,
+  ApiSpeedRoute: ApiSpeedRoute,
   PasteIdRoute: PasteIdRoute,
   PasteIndexRoute: PasteIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

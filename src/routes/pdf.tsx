@@ -22,7 +22,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { formatBytes } from "@/lib/formats";
 
 export const Route = createFileRoute("/pdf")({
-	head: () => ({ meta: [{ title: "PDF tools — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "PDF tools — Recast" }] }),
 	component: PdfPage,
 });
 

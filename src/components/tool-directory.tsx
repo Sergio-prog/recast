@@ -5,6 +5,9 @@ import {
 	CurrencyCircleDollarIcon,
 	DownloadSimpleIcon,
 	FilePdfIcon,
+	GaugeIcon,
+	GlobeIcon,
+	ListMagnifyingGlassIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -140,6 +143,47 @@ export function ToolDirectory({
 							</CardTitle>
 							<CardDescription>
 								160+ currencies with daily rates. Convert any amount both ways.
+							</CardDescription>
+						</CardHeader>
+					</Link>
+				</Card>
+				<Card className="transition-colors hover:border-primary/50">
+					<Link to="/dig" className="block">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
+								<ListMagnifyingGlassIcon className="size-4" />
+								DNS dig
+							</CardTitle>
+							<CardDescription>
+								Any record type against four public resolvers at once, with a
+								registrar summary.
+							</CardDescription>
+						</CardHeader>
+					</Link>
+				</Card>
+				<Card className="transition-colors hover:border-primary/50">
+					<Link to="/ip" className="block">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
+								<GlobeIcon className="size-4" />
+								IP inspector
+							</CardTitle>
+							<CardDescription>
+								Your public address, ISP, location and what your browser
+								reveals.
+							</CardDescription>
+						</CardHeader>
+					</Link>
+				</Card>
+				<Card className="transition-colors hover:border-primary/50">
+					<Link to="/speed" className="block">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
+								<GaugeIcon className="size-4" />
+								Speed test
+							</CardTitle>
+							<CardDescription>
+								Ping, download and upload between your browser and this server.
 							</CardDescription>
 						</CardHeader>
 					</Link>

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CategoryPage } from "@/components/category-page";
 
 export const Route = createFileRoute("/audio")({
-	head: () => ({ meta: [{ title: "Audio converter — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Audio converter — Recast" }] }),
 	component: () => (
 		<CategoryPage
 			category="audio"

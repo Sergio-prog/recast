@@ -1,14 +1,30 @@
+import {
+	ArrowRightIcon,
+	CameraIcon,
+	CaretDownIcon,
+	GaugeIcon,
+	GlobeIcon,
+	MagnifyingGlassIcon,
+} from "@phosphor-icons/react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
 	createRootRoute,
 	HeadContent,
 	Link,
 	Scripts,
+	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "next-themes";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
 
 import appCss from "../styles.css?url";
 
@@ -17,11 +33,11 @@ export const Route = createRootRoute({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ title: "ultra.convert — every format you need" },
+			{ title: "Recast — every format you need" },
 			{
 				name: "description",
 				content:
-					"Convert and compress images, video, audio, GIFs and archives. Download from YouTube and SoundCloud. Convert currencies.",
+					"Self-hosted toolbench: convert and compress any file, PDF tools, media downloader, website screenshots, DNS dig, pastebin and more.",
 			},
 			{
 				name: "theme-color",
@@ -52,10 +68,63 @@ const NAV = [
 	{ to: "/audio", label: "Audio" },
 	{ to: "/pdf", label: "PDF" },
 	{ to: "/paste", label: "Paste" },
-	{ to: "/screenshot", label: "Shot" },
+] as const;
+
+const NETWORK = [
+	{ to: "/screenshot", label: "Screenshot", icon: CameraIcon },
+	{ to: "/dig", label: "DNS dig", icon: MagnifyingGlassIcon },
+	{ to: "/ip", label: "My IP", icon: GlobeIcon },
+	{ to: "/speed", label: "Speed test", icon: GaugeIcon },
+] as const;
+
+const TAIL_NAV = [
 	{ to: "/download", label: "Download" },
 	{ to: "/currency", label: "Currency" },
 ] as const;
+
+function NavLink({ to, label }: { to: string; label: string }) {
+	return (
+		<Link
+			to={to}
+			activeOptions={{ exact: to === "/" }}
+			className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+			activeProps={{ className: "bg-muted text-foreground" }}
+		>
+			{label}
+		</Link>
+	);
+}
+
+function NetworkMenu() {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const active = NETWORK.some((item) => pathname.startsWith(item.to));
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger
+				className={cn(
+					"flex items-center gap-0.5 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground",
+					active && "bg-muted text-foreground",
+				)}
+			>
+				Network
+				<CaretDownIcon className="size-3.5" />
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				{NETWORK.map((item) => (
+					<DropdownMenuItem
+						key={item.to}
+						render={
+							<Link to={item.to}>
+								<item.icon className="size-4" />
+								{item.label}
+							</Link>
+						}
+					/>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
@@ -71,25 +140,26 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					disableTransitionOnChange
 				>
 					<header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
-						<div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
+						<div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-3 px-4">
 							<Link
 								to="/"
-								className="font-mono text-sm font-semibold tracking-tight"
+								className="flex shrink-0 items-baseline font-mono text-sm font-semibold tracking-tight"
 							>
-								ultra<span className="text-muted-foreground">.convert</span>
+								re
+								<ArrowRightIcon
+									weight="bold"
+									className="size-3 self-center text-muted-foreground"
+								/>
+								cast
 							</Link>
-							<div className="flex min-w-0 items-center gap-2">
+							<div className="flex min-w-0 items-center gap-1">
 								<nav className="flex items-center gap-0.5 overflow-x-auto">
 									{NAV.map((item) => (
-										<Link
-											key={item.to}
-											to={item.to}
-											activeOptions={{ exact: item.to === "/" }}
-											className="rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-											activeProps={{ className: "bg-muted text-foreground" }}
-										>
-											{item.label}
-										</Link>
+										<NavLink key={item.to} {...item} />
+									))}
+									<NetworkMenu />
+									{TAIL_NAV.map((item) => (
+										<NavLink key={item.to} {...item} />
 									))}
 								</nav>
 								<ThemeToggle />
@@ -100,7 +170,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<footer className="border-t py-6">
 						<div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2 px-4">
 							<p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-								sharp · ffmpeg · yt-dlp · bsdtar
+								recast.serhiifotex.dev
 							</p>
 							<p className="text-xs text-muted-foreground">
 								Files are processed on this machine — nothing is uploaded to a

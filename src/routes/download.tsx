@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
 export const Route = createFileRoute("/download")({
-	head: () => ({ meta: [{ title: "Download video & audio — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Download video & audio — Recast" }] }),
 	component: DownloadPage,
 });
 

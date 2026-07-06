@@ -16,7 +16,7 @@ import { authClient } from "@/lib/auth-client";
 import { formatBytes } from "@/lib/formats";
 
 export const Route = createFileRoute("/paste/$id")({
-	head: () => ({ meta: [{ title: "Paste — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Paste — Recast" }] }),
 	component: PasteViewPage,
 });
 

@@ -30,7 +30,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/paste/")({
-	head: () => ({ meta: [{ title: "Paste — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Paste — Recast" }] }),
 	component: PastePage,
 });
 

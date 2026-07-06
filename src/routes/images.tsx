@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CategoryPage } from "@/components/category-page";
 
 export const Route = createFileRoute("/images")({
-	head: () => ({ meta: [{ title: "Image converter — ultra.convert" }] }),
+	head: () => ({ meta: [{ title: "Image converter — Recast" }] }),
 	component: () => (
 		<CategoryPage
 			category="image"

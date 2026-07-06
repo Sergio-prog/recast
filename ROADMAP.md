@@ -1,7 +1,7 @@
 # Roadmap
 
-The unified workbench on the main page stays — it is the product. Everything below
-builds around it.
+See [VISION.md](VISION.md) for where this is going. The unified workbench on
+the main page stays — it is the product. Everything below builds around it.
 
 ## Next
 
@@ -12,8 +12,6 @@ builds around it.
   download progress.
 - **Paste syntax highlighting** — render pastes with their language, plus
   search across your own pastes by tag.
-- **DNS dig tool** — domain lookup page: A/AAAA/MX/TXT/NS/CNAME records,
-  propagation check across public resolvers, WHOIS summary.
 
 ## Later
 
@@ -33,6 +31,10 @@ builds around it.
 
 ## Done
 
+- DNS dig with four-resolver propagation check and RDAP registrar summary
+- IP inspector (public address, ISP, geo, reverse DNS, browser fingerprint)
+- Speed test (ping/download/upload against your own server)
+- Supabase Postgres storage for auth and pastes (replaced local SQLite)
 - Unified conversion workbench (images, video, audio, GIFs, archives) with
   per-file targets, quality knobs and parallel conversion
 - Dedicated converter pages: `/images`, `/video`, `/audio`
