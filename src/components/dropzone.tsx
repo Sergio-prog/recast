@@ -4,8 +4,10 @@ import { cn } from "@/lib/utils";
 
 export function Dropzone({
 	onFiles,
+	hint = "or click to browse — images, video, audio, GIFs, archives",
 }: {
 	onFiles: (files: Array<File>) => void;
+	hint?: string;
 }) {
 	const [dragging, setDragging] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -34,9 +36,7 @@ export function Dropzone({
 				<PlusIcon weight="bold" className="size-4" />
 				Drop files here
 			</span>
-			<span className="text-sm text-muted-foreground">
-				or click to browse — images, video, audio, GIFs, archives
-			</span>
+			<span className="text-sm text-muted-foreground">{hint}</span>
 			<input
 				ref={inputRef}
 				type="file"
