@@ -1,10 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FORMATS, normalizeExt, replaceExt, targetsFor } from "@/lib/formats";
+import { normalizeExt, targetsFor } from "@/lib/formats";
 
 export const Route = createFileRoute("/api/convert")({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
+				const { maxUploadBytes, rateLimit, tooLarge } = await import(
+					"@/server/limits"
+				);
+				const limited =
+					rateLimit(request, "convert", 30) ??
+					tooLarge(request, maxUploadBytes);
+				if (limited) return limited;
 				const form = await request.formData();
 				const file = form.get("file");
 				const target = String(form.get("target") ?? "");
@@ -29,18 +36,17 @@ export const Route = createFileRoute("/api/convert")({
 				try {
 					const { convert } = await import("@/server/convert");
 					const { contentDisposition } = await import("@/server/http");
-					const output = await convert(
+					const result = await convert(
 						Buffer.from(await file.arrayBuffer()),
+						file.name,
 						src,
 						target,
 						quality,
 					);
-					return new Response(new Uint8Array(output), {
+					return new Response(new Uint8Array(result.data), {
 						headers: {
-							"content-type": FORMATS[target].mime,
-							"content-disposition": contentDisposition(
-								replaceExt(file.name, target),
-							),
+							"content-type": result.mime,
+							"content-disposition": contentDisposition(result.filename),
 						},
 					});
 				} catch (e) {

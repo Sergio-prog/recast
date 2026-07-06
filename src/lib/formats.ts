@@ -1,4 +1,4 @@
-export type Category = "image" | "video" | "audio" | "archive";
+export type Category = "image" | "video" | "audio" | "archive" | "document";
 
 export type FormatDef = {
 	ext: string;
@@ -44,6 +44,7 @@ export const FORMATS: Record<string, FormatDef> = {
 	"tar.bz2": def("tar.bz2", "TAR.BZ2", "archive", "application/x-bzip2"),
 	"tar.xz": def("tar.xz", "TAR.XZ", "archive", "application/x-xz"),
 	"7z": def("7z", "7Z", "archive", "application/x-7z-compressed"),
+	pdf: def("pdf", "PDF", "document", "application/pdf"),
 };
 
 const ALIASES: Record<string, string> = {
@@ -91,14 +92,16 @@ export function targetsFor(src: string): Array<string> {
 	switch (format.category) {
 		case "image":
 			return src === "gif"
-				? [...writable("image"), "mp4", "webm"]
-				: writable("image");
+				? [...writable("image"), "mp4", "webm", "pdf"]
+				: [...writable("image"), "pdf"];
 		case "video":
 			return [...writable("video"), "gif", ...writable("audio")];
 		case "audio":
 			return writable("audio");
 		case "archive":
 			return writable("archive").filter((ext) => ext !== src);
+		case "document":
+			return ["png", "jpg"];
 	}
 }
 
@@ -130,6 +133,7 @@ const DEFAULT_TARGET: Record<string, string> = {
 	"tar.bz2": "zip",
 	"tar.xz": "zip",
 	"7z": "zip",
+	pdf: "png",
 };
 
 export function defaultTargetFor(src: string): string {
@@ -141,7 +145,11 @@ const LOSSLESS = new Set(["wav", "flac"]);
 export function hasQualityKnob(target: string): boolean {
 	const format = FORMATS[target];
 	if (!format) return false;
-	return format.category !== "archive" && !LOSSLESS.has(target);
+	return (
+		format.category !== "archive" &&
+		format.category !== "document" &&
+		!LOSSLESS.has(target)
+	);
 }
 
 export const POPULAR_PAIRS: ReadonlyArray<readonly [string, string]> = [
@@ -167,6 +175,10 @@ export const POPULAR_PAIRS: ReadonlyArray<readonly [string, string]> = [
 	["zip", "tar.gz"],
 	["tar.gz", "zip"],
 	["7z", "zip"],
+	["pdf", "png"],
+	["pdf", "jpg"],
+	["jpg", "pdf"],
+	["png", "pdf"],
 ];
 
 export const CATEGORY_META: Record<Category, { label: string; blurb: string }> =
@@ -187,6 +199,10 @@ export const CATEGORY_META: Record<Category, { label: string; blurb: string }> =
 		archive: {
 			label: "Archives",
 			blurb: "ZIP, TAR, TAR.GZ, TAR.BZ2, TAR.XZ, 7Z",
+		},
+		document: {
+			label: "PDF",
+			blurb: "Images to PDF, PDF to images — merge and split on the PDF page",
 		},
 	};
 
