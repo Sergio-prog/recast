@@ -47,6 +47,12 @@ export const Route = createRootRoute({
 
 const NAV = [
 	{ to: "/", label: "Convert" },
+	{ to: "/images", label: "Images" },
+	{ to: "/video", label: "Video" },
+	{ to: "/audio", label: "Audio" },
+	{ to: "/pdf", label: "PDF" },
+	{ to: "/paste", label: "Paste" },
+	{ to: "/screenshot", label: "Shot" },
 	{ to: "/download", label: "Download" },
 	{ to: "/currency", label: "Currency" },
 ] as const;
@@ -72,8 +78,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							>
 								ultra<span className="text-muted-foreground">.convert</span>
 							</Link>
-							<div className="flex items-center gap-2">
-								<nav className="flex items-center gap-1">
+							<div className="flex min-w-0 items-center gap-2">
+								<nav className="flex items-center gap-0.5 overflow-x-auto">
 									{NAV.map((item) => (
 										<Link
 											key={item.to}

@@ -1,7 +1,10 @@
 import {
 	ArrowRightIcon,
+	CameraIcon,
+	ClipboardTextIcon,
 	CurrencyCircleDollarIcon,
 	DownloadSimpleIcon,
+	FilePdfIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -18,7 +21,12 @@ import {
 	POPULAR_PAIRS,
 } from "@/lib/formats";
 
-const CATEGORIES: Array<Category> = ["image", "video", "audio", "archive"];
+const CATEGORIES: Array<{ category: Category; page: string | null }> = [
+	{ category: "image", page: "/images" },
+	{ category: "video", page: "/video" },
+	{ category: "audio", page: "/audio" },
+	{ category: "archive", page: null },
+];
 
 export function ToolDirectory({
 	onPick,
@@ -33,11 +41,19 @@ export function ToolDirectory({
 				per file.
 			</p>
 			<div className="mt-6 grid gap-4 sm:grid-cols-2">
-				{CATEGORIES.map((category) => (
+				{CATEGORIES.map(({ category, page }) => (
 					<Card key={category}>
 						<CardHeader>
-							<CardTitle className="font-mono text-sm uppercase tracking-widest">
+							<CardTitle className="flex items-baseline justify-between gap-2 font-mono text-sm uppercase tracking-widest">
 								{CATEGORY_META[category].label}
+								{page && (
+									<Link
+										to={page}
+										className="text-xs normal-case tracking-normal text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+									>
+										Dedicated page →
+									</Link>
+								)}
 							</CardTitle>
 							<CardDescription>{CATEGORY_META[category].blurb}</CardDescription>
 						</CardHeader>
@@ -59,6 +75,48 @@ export function ToolDirectory({
 						</CardContent>
 					</Card>
 				))}
+				<Card className="transition-colors hover:border-primary/50">
+					<Link to="/pdf" className="block">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
+								<FilePdfIcon className="size-4" />
+								PDF tools
+							</CardTitle>
+							<CardDescription>
+								Merge PDFs, split by pages or ranges, bundle images into one PDF
+								— plus PDF ↔ image on the workbench.
+							</CardDescription>
+						</CardHeader>
+					</Link>
+				</Card>
+				<Card className="transition-colors hover:border-primary/50">
+					<Link to="/screenshot" className="block">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
+								<CameraIcon className="size-4" />
+								Website screenshot
+							</CardTitle>
+							<CardDescription>
+								Capture any page as PNG or JPG — viewport presets, full page,
+								dark mode and a delay for animated sites.
+							</CardDescription>
+						</CardHeader>
+					</Link>
+				</Card>
+				<Card className="transition-colors hover:border-primary/50">
+					<Link to="/paste" className="block">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
+								<ClipboardTextIcon className="size-4" />
+								Pastebin
+							</CardTitle>
+							<CardDescription>
+								Link-only or private pastes with tags and expiry. Google sign-in
+								required.
+							</CardDescription>
+						</CardHeader>
+					</Link>
+				</Card>
 				<Card className="transition-colors hover:border-primary/50">
 					<Link to="/download" className="block">
 						<CardHeader>

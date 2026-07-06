@@ -9,13 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VideoRouteImport } from './routes/video'
+import { Route as ScreenshotRouteImport } from './routes/screenshot'
+import { Route as PdfRouteImport } from './routes/pdf'
+import { Route as ImagesRouteImport } from './routes/images'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as CurrencyRouteImport } from './routes/currency'
+import { Route as AudioRouteImport } from './routes/audio'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PasteIndexRouteImport } from './routes/paste/index'
+import { Route as PasteIdRouteImport } from './routes/paste/$id'
+import { Route as ApiScreenshotRouteImport } from './routes/api/screenshot'
+import { Route as ApiPdfRouteImport } from './routes/api/pdf'
+import { Route as ApiPasteRouteImport } from './routes/api/paste'
 import { Route as ApiDownloadRouteImport } from './routes/api/download'
 import { Route as ApiCurrencyRouteImport } from './routes/api/currency'
 import { Route as ApiConvertRouteImport } from './routes/api/convert'
+import { Route as ApiPasteIdRouteImport } from './routes/api/paste.$id'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
+const VideoRoute = VideoRouteImport.update({
+  id: '/video',
+  path: '/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreenshotRoute = ScreenshotRouteImport.update({
+  id: '/screenshot',
+  path: '/screenshot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PdfRoute = PdfRouteImport.update({
+  id: '/pdf',
+  path: '/pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImagesRoute = ImagesRouteImport.update({
+  id: '/images',
+  path: '/images',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
@@ -26,9 +58,39 @@ const CurrencyRoute = CurrencyRouteImport.update({
   path: '/currency',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AudioRoute = AudioRouteImport.update({
+  id: '/audio',
+  path: '/audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PasteIndexRoute = PasteIndexRouteImport.update({
+  id: '/paste/',
+  path: '/paste/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PasteIdRoute = PasteIdRouteImport.update({
+  id: '/paste/$id',
+  path: '/paste/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiScreenshotRoute = ApiScreenshotRouteImport.update({
+  id: '/api/screenshot',
+  path: '/api/screenshot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPdfRoute = ApiPdfRouteImport.update({
+  id: '/api/pdf',
+  path: '/api/pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPasteRoute = ApiPasteRouteImport.update({
+  id: '/api/paste',
+  path: '/api/paste',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDownloadRoute = ApiDownloadRouteImport.update({
@@ -46,70 +108,191 @@ const ApiConvertRoute = ApiConvertRouteImport.update({
   path: '/api/convert',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPasteIdRoute = ApiPasteIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiPasteRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
   '/download': typeof DownloadRoute
+  '/images': typeof ImagesRoute
+  '/pdf': typeof PdfRoute
+  '/screenshot': typeof ScreenshotRoute
+  '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/download': typeof ApiDownloadRoute
+  '/api/paste': typeof ApiPasteRouteWithChildren
+  '/api/pdf': typeof ApiPdfRoute
+  '/api/screenshot': typeof ApiScreenshotRoute
+  '/paste/$id': typeof PasteIdRoute
+  '/paste/': typeof PasteIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/paste/$id': typeof ApiPasteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
   '/download': typeof DownloadRoute
+  '/images': typeof ImagesRoute
+  '/pdf': typeof PdfRoute
+  '/screenshot': typeof ScreenshotRoute
+  '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/download': typeof ApiDownloadRoute
+  '/api/paste': typeof ApiPasteRouteWithChildren
+  '/api/pdf': typeof ApiPdfRoute
+  '/api/screenshot': typeof ApiScreenshotRoute
+  '/paste/$id': typeof PasteIdRoute
+  '/paste': typeof PasteIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/paste/$id': typeof ApiPasteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
   '/download': typeof DownloadRoute
+  '/images': typeof ImagesRoute
+  '/pdf': typeof PdfRoute
+  '/screenshot': typeof ScreenshotRoute
+  '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/download': typeof ApiDownloadRoute
+  '/api/paste': typeof ApiPasteRouteWithChildren
+  '/api/pdf': typeof ApiPdfRoute
+  '/api/screenshot': typeof ApiScreenshotRoute
+  '/paste/$id': typeof PasteIdRoute
+  '/paste/': typeof PasteIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/paste/$id': typeof ApiPasteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/audio'
     | '/currency'
     | '/download'
+    | '/images'
+    | '/pdf'
+    | '/screenshot'
+    | '/video'
     | '/api/convert'
     | '/api/currency'
     | '/api/download'
+    | '/api/paste'
+    | '/api/pdf'
+    | '/api/screenshot'
+    | '/paste/$id'
+    | '/paste/'
+    | '/api/auth/$'
+    | '/api/paste/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/audio'
     | '/currency'
     | '/download'
+    | '/images'
+    | '/pdf'
+    | '/screenshot'
+    | '/video'
     | '/api/convert'
     | '/api/currency'
     | '/api/download'
+    | '/api/paste'
+    | '/api/pdf'
+    | '/api/screenshot'
+    | '/paste/$id'
+    | '/paste'
+    | '/api/auth/$'
+    | '/api/paste/$id'
   id:
     | '__root__'
     | '/'
+    | '/audio'
     | '/currency'
     | '/download'
+    | '/images'
+    | '/pdf'
+    | '/screenshot'
+    | '/video'
     | '/api/convert'
     | '/api/currency'
     | '/api/download'
+    | '/api/paste'
+    | '/api/pdf'
+    | '/api/screenshot'
+    | '/paste/$id'
+    | '/paste/'
+    | '/api/auth/$'
+    | '/api/paste/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AudioRoute: typeof AudioRoute
   CurrencyRoute: typeof CurrencyRoute
   DownloadRoute: typeof DownloadRoute
+  ImagesRoute: typeof ImagesRoute
+  PdfRoute: typeof PdfRoute
+  ScreenshotRoute: typeof ScreenshotRoute
+  VideoRoute: typeof VideoRoute
   ApiConvertRoute: typeof ApiConvertRoute
   ApiCurrencyRoute: typeof ApiCurrencyRoute
   ApiDownloadRoute: typeof ApiDownloadRoute
+  ApiPasteRoute: typeof ApiPasteRouteWithChildren
+  ApiPdfRoute: typeof ApiPdfRoute
+  ApiScreenshotRoute: typeof ApiScreenshotRoute
+  PasteIdRoute: typeof PasteIdRoute
+  PasteIndexRoute: typeof PasteIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/video': {
+      id: '/video'
+      path: '/video'
+      fullPath: '/video'
+      preLoaderRoute: typeof VideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screenshot': {
+      id: '/screenshot'
+      path: '/screenshot'
+      fullPath: '/screenshot'
+      preLoaderRoute: typeof ScreenshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pdf': {
+      id: '/pdf'
+      path: '/pdf'
+      fullPath: '/pdf'
+      preLoaderRoute: typeof PdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/images': {
+      id: '/images'
+      path: '/images'
+      fullPath: '/images'
+      preLoaderRoute: typeof ImagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/download': {
       id: '/download'
       path: '/download'
@@ -124,11 +307,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CurrencyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/audio': {
+      id: '/audio'
+      path: '/audio'
+      fullPath: '/audio'
+      preLoaderRoute: typeof AudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paste/': {
+      id: '/paste/'
+      path: '/paste'
+      fullPath: '/paste/'
+      preLoaderRoute: typeof PasteIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paste/$id': {
+      id: '/paste/$id'
+      path: '/paste/$id'
+      fullPath: '/paste/$id'
+      preLoaderRoute: typeof PasteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/screenshot': {
+      id: '/api/screenshot'
+      path: '/api/screenshot'
+      fullPath: '/api/screenshot'
+      preLoaderRoute: typeof ApiScreenshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pdf': {
+      id: '/api/pdf'
+      path: '/api/pdf'
+      fullPath: '/api/pdf'
+      preLoaderRoute: typeof ApiPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/paste': {
+      id: '/api/paste'
+      path: '/api/paste'
+      fullPath: '/api/paste'
+      preLoaderRoute: typeof ApiPasteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/download': {
@@ -152,16 +377,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiConvertRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/paste/$id': {
+      id: '/api/paste/$id'
+      path: '/$id'
+      fullPath: '/api/paste/$id'
+      preLoaderRoute: typeof ApiPasteIdRouteImport
+      parentRoute: typeof ApiPasteRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface ApiPasteRouteChildren {
+  ApiPasteIdRoute: typeof ApiPasteIdRoute
+}
+
+const ApiPasteRouteChildren: ApiPasteRouteChildren = {
+  ApiPasteIdRoute: ApiPasteIdRoute,
+}
+
+const ApiPasteRouteWithChildren = ApiPasteRoute._addFileChildren(
+  ApiPasteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AudioRoute: AudioRoute,
   CurrencyRoute: CurrencyRoute,
   DownloadRoute: DownloadRoute,
+  ImagesRoute: ImagesRoute,
+  PdfRoute: PdfRoute,
+  ScreenshotRoute: ScreenshotRoute,
+  VideoRoute: VideoRoute,
   ApiConvertRoute: ApiConvertRoute,
   ApiCurrencyRoute: ApiCurrencyRoute,
   ApiDownloadRoute: ApiDownloadRoute,
+  ApiPasteRoute: ApiPasteRouteWithChildren,
+  ApiPdfRoute: ApiPdfRoute,
+  ApiScreenshotRoute: ApiScreenshotRoute,
+  PasteIdRoute: PasteIdRoute,
+  PasteIndexRoute: PasteIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
