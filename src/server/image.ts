@@ -66,7 +66,11 @@ async function heicToPng(input: Buffer): Promise<Buffer> {
 			const inPath = join(dir, "in.heic");
 			const outPath = join(dir, "out.png");
 			await writeFile(inPath, input);
-			await run("sips", ["-s", "format", "png", inPath, "--out", outPath]);
+			if (process.platform === "darwin") {
+				await run("sips", ["-s", "format", "png", inPath, "--out", outPath]);
+			} else {
+				await run("heif-convert", [inPath, outPath]);
+			}
 			return await readFile(outPath);
 		} finally {
 			await rm(dir, { recursive: true, force: true });
