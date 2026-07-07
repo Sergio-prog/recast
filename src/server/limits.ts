@@ -1,3 +1,5 @@
+import { clientIpFrom } from "./http";
+
 const MB = 1024 * 1024;
 
 export const maxUploadBytes = Number(process.env.MAX_UPLOAD_MB ?? 512) * MB;
@@ -19,11 +21,7 @@ const buckets = new Map<string, Array<number>>();
 const WINDOW_MS = 60_000;
 
 function clientKey(request: Request): string {
-	if (process.env.TRUST_PROXY === "1") {
-		const forwarded = request.headers.get("x-forwarded-for");
-		if (forwarded) return forwarded.split(",")[0].trim();
-	}
-	return request.headers.get("x-client-ip") ?? "anon";
+	return clientIpFrom(request) ?? "anon";
 }
 
 export function rateLimit(

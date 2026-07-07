@@ -15,9 +15,6 @@ type Geo = {
 const geoCache = new Map<string, { at: number; body: Geo | null }>();
 const GEO_TTL_MS = 60 * 60 * 1000;
 
-const PRIVATE_IP =
-	/^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|::1$|f[cde])/i;
-
 async function lookup(ip: string | null): Promise<Geo | null> {
 	const key = ip ?? "self";
 	const hit = geoCache.get(key);
@@ -55,12 +52,9 @@ export const Route = createFileRoute("/api/ip")({
 				const { rateLimit } = await import("@/server/limits");
 				const limited = rateLimit(request, "ip", 30);
 				if (limited) return limited;
-				const forwarded = request.headers.get("x-forwarded-for");
-				const clientIp =
-					(process.env.TRUST_PROXY === "1" && forwarded
-						? forwarded.split(",")[0].trim()
-						: null) ?? request.headers.get("x-client-ip");
-				const isPublic = Boolean(clientIp) && !PRIVATE_IP.test(clientIp ?? "");
+				const { clientIpFrom, isPrivateIp } = await import("@/server/http");
+				const clientIp = clientIpFrom(request);
+				const isPublic = Boolean(clientIp) && !isPrivateIp(clientIp ?? "");
 				const geo = await lookup(isPublic ? clientIp : null);
 				let reverse: Array<string> = [];
 				const ipForReverse = isPublic ? clientIp : (geo?.ip ?? null);
