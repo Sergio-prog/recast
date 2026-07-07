@@ -4,19 +4,18 @@ import {
 	ClipboardTextIcon,
 	CurrencyCircleDollarIcon,
 	DownloadSimpleIcon,
+	FileArchiveIcon,
 	FilePdfIcon,
+	FilmStripIcon,
 	GaugeIcon,
 	GlobeIcon,
+	type Icon,
+	ImageIcon,
 	ListMagnifyingGlassIcon,
+	TextAaIcon,
+	WaveformIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import {
 	CATEGORY_META,
 	type Category,
@@ -24,11 +23,77 @@ import {
 	POPULAR_PAIRS,
 } from "@/lib/formats";
 
-const CATEGORIES: Array<{ category: Category; page: string | null }> = [
-	{ category: "image", page: "/images" },
-	{ category: "video", page: "/video" },
-	{ category: "audio", page: "/audio" },
-	{ category: "archive", page: null },
+const CATEGORIES: Array<{
+	category: Category;
+	page: string | null;
+	icon: Icon;
+}> = [
+	{ category: "image", page: "/images", icon: ImageIcon },
+	{ category: "video", page: "/video", icon: FilmStripIcon },
+	{ category: "audio", page: "/audio", icon: WaveformIcon },
+	{ category: "archive", page: null, icon: FileArchiveIcon },
+];
+
+const TOOLS: Array<{
+	to: string;
+	label: string;
+	blurb: string;
+	icon: Icon;
+}> = [
+	{
+		to: "/pdf",
+		label: "PDF tools",
+		blurb: "Merge, split by pages or ranges, or bundle images into one PDF.",
+		icon: FilePdfIcon,
+	},
+	{
+		to: "/screenshot",
+		label: "Screenshot",
+		blurb: "Any page as PNG or JPG — full page, dark mode, delay.",
+		icon: CameraIcon,
+	},
+	{
+		to: "/tokenizer",
+		label: "Tokenizer",
+		blurb: "Count GPT, Claude or Gemini tokens and see every token piece.",
+		icon: TextAaIcon,
+	},
+	{
+		to: "/paste",
+		label: "Pastebin",
+		blurb: "Link-only or private pastes with tags and expiry.",
+		icon: ClipboardTextIcon,
+	},
+	{
+		to: "/download",
+		label: "Downloader",
+		blurb: "MP4 video or MP3 audio from YouTube and 1,800+ sites.",
+		icon: DownloadSimpleIcon,
+	},
+	{
+		to: "/currency",
+		label: "Currency",
+		blurb: "160+ currencies with daily rates, converted both ways.",
+		icon: CurrencyCircleDollarIcon,
+	},
+	{
+		to: "/dig",
+		label: "DNS dig",
+		blurb: "Any record type across four resolvers, with a registrar summary.",
+		icon: ListMagnifyingGlassIcon,
+	},
+	{
+		to: "/ip",
+		label: "IP inspector",
+		blurb: "Your address, ISP, location — and what your browser reveals.",
+		icon: GlobeIcon,
+	},
+	{
+		to: "/speed",
+		label: "Speed test",
+		blurb: "Ping, download and upload between your browser and this server.",
+		icon: GaugeIcon,
+	},
 ];
 
 export function ToolDirectory({
@@ -38,29 +103,38 @@ export function ToolDirectory({
 }) {
 	return (
 		<section className="mx-auto w-full max-w-5xl px-4 pb-20 pt-16">
-			<h2 className="font-display text-2xl font-semibold">All tools</h2>
-			<p className="mt-1 text-sm text-muted-foreground">
+			<h2 className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+				Convert
+			</h2>
+			<p className="mt-2 text-sm text-muted-foreground">
 				Pick a pair to preset the workbench, or drop files and choose a target
 				per file.
 			</p>
-			<div className="mt-6 grid gap-4 sm:grid-cols-2">
-				{CATEGORIES.map(({ category, page }) => (
-					<Card key={category}>
-						<CardHeader>
-							<CardTitle className="flex items-baseline justify-between gap-2 font-mono text-sm uppercase tracking-widest">
+			<div className="mt-5 grid gap-4 sm:grid-cols-2">
+				{CATEGORIES.map(({ category, page, icon: CategoryIcon }) => (
+					<div
+						key={category}
+						className="group rounded-xl border bg-card p-5 transition-colors hover:border-primary/40"
+					>
+						<div className="flex items-center gap-2.5">
+							<CategoryIcon className="size-4.5 text-muted-foreground transition-colors group-hover:text-primary" />
+							<h3 className="font-mono text-sm uppercase tracking-widest">
 								{CATEGORY_META[category].label}
-								{page && (
-									<Link
-										to={page}
-										className="text-xs normal-case tracking-normal text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
-									>
-										Dedicated page →
-									</Link>
-								)}
-							</CardTitle>
-							<CardDescription>{CATEGORY_META[category].blurb}</CardDescription>
-						</CardHeader>
-						<CardContent className="flex flex-wrap gap-2">
+							</h3>
+							{page && (
+								<Link
+									to={page}
+									className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary"
+								>
+									Open page
+									<ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-0.5" />
+								</Link>
+							)}
+						</div>
+						<p className="mt-2 text-sm text-muted-foreground">
+							{CATEGORY_META[category].blurb}
+						</p>
+						<div className="mt-4 flex flex-wrap gap-2">
 							{POPULAR_PAIRS.filter(
 								([from]) => FORMATS[from]?.category === category,
 							).map(([from, to]) => (
@@ -68,126 +142,39 @@ export function ToolDirectory({
 									key={`${from}-${to}`}
 									type="button"
 									onClick={() => onPick([from, to])}
-									className="inline-flex items-center gap-1 rounded-md border bg-background px-2 py-1 font-mono text-xs uppercase transition-colors hover:border-primary hover:text-primary"
+									className="inline-flex items-center gap-1 rounded-md border bg-background px-2 py-1 font-mono text-xs uppercase transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
 								>
 									{from}
 									<ArrowRightIcon className="size-3" />
 									{to}
 								</button>
 							))}
-						</CardContent>
-					</Card>
+						</div>
+					</div>
 				))}
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/pdf" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<FilePdfIcon className="size-4" />
-								PDF tools
-							</CardTitle>
-							<CardDescription>
-								Merge PDFs, split by pages or ranges, bundle images into one PDF
-								— plus PDF ↔ image on the workbench.
-							</CardDescription>
-						</CardHeader>
+			</div>
+			<h2 className="mt-14 font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+				Standalone tools
+			</h2>
+			<div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+				{TOOLS.map(({ to, label, blurb, icon: ToolIcon }) => (
+					<Link
+						key={to}
+						to={to}
+						className="group rounded-xl border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+					>
+						<div className="flex items-center gap-2">
+							<ToolIcon className="size-4 text-muted-foreground transition-colors group-hover:text-primary" />
+							<span className="font-mono text-xs uppercase tracking-widest">
+								{label}
+							</span>
+							<ArrowRightIcon className="ml-auto size-3.5 -translate-x-1 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+						</div>
+						<p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+							{blurb}
+						</p>
 					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/screenshot" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<CameraIcon className="size-4" />
-								Website screenshot
-							</CardTitle>
-							<CardDescription>
-								Capture any page as PNG or JPG — viewport presets, full page,
-								dark mode and a delay for animated sites.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/paste" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<ClipboardTextIcon className="size-4" />
-								Pastebin
-							</CardTitle>
-							<CardDescription>
-								Link-only or private pastes with tags and expiry. Google sign-in
-								required.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/download" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<DownloadSimpleIcon className="size-4" />
-								Video & audio downloader
-							</CardTitle>
-							<CardDescription>
-								Save video as MP4 or audio as MP3 from YouTube, SoundCloud and
-								1,800+ other sites.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/currency" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<CurrencyCircleDollarIcon className="size-4" />
-								Currency converter
-							</CardTitle>
-							<CardDescription>
-								160+ currencies with daily rates. Convert any amount both ways.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/dig" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<ListMagnifyingGlassIcon className="size-4" />
-								DNS dig
-							</CardTitle>
-							<CardDescription>
-								Any record type against four public resolvers at once, with a
-								registrar summary.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/ip" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<GlobeIcon className="size-4" />
-								IP inspector
-							</CardTitle>
-							<CardDescription>
-								Your public address, ISP, location and what your browser
-								reveals.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
-				<Card className="transition-colors hover:border-primary/50">
-					<Link to="/speed" className="block">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-								<GaugeIcon className="size-4" />
-								Speed test
-							</CardTitle>
-							<CardDescription>
-								Ping, download and upload between your browser and this server.
-							</CardDescription>
-						</CardHeader>
-					</Link>
-				</Card>
+				))}
 			</div>
 		</section>
 	);
