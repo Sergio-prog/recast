@@ -9,7 +9,7 @@ function getBrowser(): Promise<Browser> {
 				executablePath: process.env.CHROMIUM_PATH || undefined,
 				args:
 					process.env.CHROMIUM_NO_SANDBOX === "1"
-						? ["--no-sandbox", "--disable-dev-shm-usage"]
+						? ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
 						: [],
 			})
 			.then((browser) => {
