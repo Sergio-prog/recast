@@ -7,6 +7,7 @@ import {
 	FORMATS,
 	normalizeExt,
 	replaceExt,
+	targetsFor,
 } from "@/lib/formats";
 
 export function useWorkbench(allowed?: ReadonlyArray<Category>) {
@@ -105,19 +106,26 @@ export function useWorkbench(allowed?: ReadonlyArray<Category>) {
 		preferred.current[pair[0]] = pair[1];
 		setHint(pair);
 		setJobs((prev) =>
-			prev.map((j) =>
-				j.ext === pair[0] && j.status !== "working"
-					? {
-							...j,
-							target: pair[1],
-							status: "ready",
-							outUrl: undefined,
-							outName: undefined,
-							outSize: undefined,
-							error: undefined,
-						}
-					: j,
-			),
+			prev.map((j) => {
+				if (
+					j.status === "working" ||
+					j.status === "unsupported" ||
+					j.target === pair[1] ||
+					!targetsFor(j.ext).includes(pair[1])
+				) {
+					return j;
+				}
+				preferred.current[j.ext] = pair[1];
+				return {
+					...j,
+					target: pair[1],
+					status: "ready",
+					outUrl: undefined,
+					outName: undefined,
+					outSize: undefined,
+					error: undefined,
+				};
+			}),
 		);
 	};
 
