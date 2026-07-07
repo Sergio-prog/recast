@@ -28,36 +28,59 @@ import { cn } from "@/lib/utils";
 
 import appCss from "../styles.css?url";
 
+const SITE_URL = "https://recast.serhiifotex.dev";
+const SITE_TITLE = "Recast — every format you need";
+const SITE_DESCRIPTION =
+	"Self-hosted toolbench: convert and compress any file, PDF tools, media downloader, website screenshots, DNS dig, pastebin and more.";
+const OG_IMAGE = `${SITE_URL}/og.png`;
+
 export const Route = createRootRoute({
-	head: () => ({
-		meta: [
-			{ charSet: "utf-8" },
-			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ title: "Recast — every format you need" },
-			{
-				name: "description",
-				content:
-					"Self-hosted toolbench: convert and compress any file, PDF tools, media downloader, website screenshots, DNS dig, pastebin and more.",
-			},
-			{
-				name: "theme-color",
-				media: "(prefers-color-scheme: light)",
-				content: "#ffffff",
-			},
-			{
-				name: "theme-color",
-				media: "(prefers-color-scheme: dark)",
-				content: "#131316",
-			},
-		],
-		links: [
-			{ rel: "stylesheet", href: appCss },
-			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-			{ rel: "icon", href: "/favicon.ico", sizes: "32x32" },
-			{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-			{ rel: "manifest", href: "/manifest.json" },
-		],
-	}),
+	head: ({ matches }) => {
+		const pathname = matches.at(-1)?.pathname ?? "/";
+		const pageUrl = `${SITE_URL}${pathname === "/" ? "" : pathname}`;
+		return {
+			meta: [
+				{ charSet: "utf-8" },
+				{ name: "viewport", content: "width=device-width, initial-scale=1" },
+				{ title: SITE_TITLE },
+				{ name: "description", content: SITE_DESCRIPTION },
+				{ property: "og:type", content: "website" },
+				{ property: "og:site_name", content: "Recast" },
+				{ property: "og:title", content: SITE_TITLE },
+				{ property: "og:description", content: SITE_DESCRIPTION },
+				{ property: "og:url", content: pageUrl },
+				{ property: "og:image", content: OG_IMAGE },
+				{ property: "og:image:width", content: "1200" },
+				{ property: "og:image:height", content: "630" },
+				{
+					property: "og:image:alt",
+					content: "Recast — every format you need",
+				},
+				{ name: "twitter:card", content: "summary_large_image" },
+				{ name: "twitter:title", content: SITE_TITLE },
+				{ name: "twitter:description", content: SITE_DESCRIPTION },
+				{ name: "twitter:image", content: OG_IMAGE },
+				{
+					name: "theme-color",
+					media: "(prefers-color-scheme: light)",
+					content: "#ffffff",
+				},
+				{
+					name: "theme-color",
+					media: "(prefers-color-scheme: dark)",
+					content: "#131316",
+				},
+			],
+			links: [
+				{ rel: "canonical", href: pageUrl },
+				{ rel: "stylesheet", href: appCss },
+				{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+				{ rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+				{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+				{ rel: "manifest", href: "/manifest.json" },
+			],
+		};
+	},
 	shellComponent: RootDocument,
 });
 
