@@ -7,7 +7,10 @@ function getBrowser(): Promise<Browser> {
 		browserPromise = chromium
 			.launch({
 				executablePath: process.env.CHROMIUM_PATH || undefined,
-				args: process.env.CHROMIUM_NO_SANDBOX === "1" ? ["--no-sandbox"] : [],
+				args:
+					process.env.CHROMIUM_NO_SANDBOX === "1"
+						? ["--no-sandbox", "--disable-dev-shm-usage"]
+						: [],
 			})
 			.then((browser) => {
 				browser.on("disconnected", () => {
@@ -40,9 +43,12 @@ export async function captureScreenshot(
 	try {
 		browser = await getBrowser();
 	} catch (e) {
-		const detail = e instanceof Error ? e.message.split("\n")[0] : "";
+		console.error(
+			"[screenshot] Chromium failed to launch. Install it with: bunx playwright-core install chromium-headless-shell — or point CHROMIUM_PATH at a Chrome/Chromium binary.",
+			e,
+		);
 		throw new Error(
-			`Chromium is not available (${detail}). Install it with: bunx playwright-core install chromium-headless-shell — or point CHROMIUM_PATH at a Chrome/Chromium binary.`,
+			"Screenshots are unavailable right now — the browser could not start on the server. Try again in a minute.",
 		);
 	}
 	const context = await browser.newContext({
