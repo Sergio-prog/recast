@@ -45,6 +45,7 @@ export const Route = createFileRoute("/api/screenshot")({
 						},
 					});
 				} catch (e) {
+					console.error("[screenshot]", e);
 					const message = e instanceof Error ? e.message : "Screenshot failed";
 					return new Response(message, { status: 500 });
 				}

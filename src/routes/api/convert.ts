@@ -50,6 +50,7 @@ export const Route = createFileRoute("/api/convert")({
 						},
 					});
 				} catch (e) {
+					console.error("[convert]", e);
 					const message = e instanceof Error ? e.message : "Conversion failed";
 					return new Response(message, { status: 500 });
 				}

@@ -24,6 +24,7 @@ export const Route = createFileRoute("/api/download")({
 					const { fetchInfo } = await import("@/server/download");
 					return Response.json(await fetchInfo(url));
 				} catch (e) {
+					console.error("[download]", e);
 					const message = e instanceof Error ? e.message : "Download failed";
 					return new Response(message, { status: 500 });
 				}

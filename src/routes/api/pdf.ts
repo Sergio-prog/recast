@@ -78,6 +78,7 @@ export const Route = createFileRoute("/api/pdf")({
 					}
 					return new Response("Unknown operation", { status: 400 });
 				} catch (e) {
+					console.error("[pdf]", e);
 					const message =
 						e instanceof Error ? e.message : "PDF operation failed";
 					return new Response(message, { status: 500 });

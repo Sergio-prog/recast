@@ -4,9 +4,20 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { contentDisposition } from "./http";
-import { run } from "./proc";
+import { ProcError, run } from "./proc";
 
 const YTDLP = process.env.YTDLP_PATH ?? "yt-dlp";
+
+function friendly(e: unknown): Error {
+	if (e instanceof ProcError) {
+		const line = e.detail.match(/^ERROR:\s*(.+)$/m)?.[1];
+		return new Error(
+			line ??
+				"Download failed — the site may be unsupported or the link invalid",
+		);
+	}
+	return e instanceof Error ? e : new Error(String(e));
+}
 
 export type MediaInfo = {
 	title: string;
@@ -21,7 +32,9 @@ export async function fetchInfo(url: string): Promise<MediaInfo> {
 		YTDLP,
 		["-J", "--no-playlist", "--no-warnings", url],
 		60_000,
-	);
+	).catch((e: unknown) => {
+		throw friendly(e);
+	});
 	const info = JSON.parse(out);
 	return {
 		title: info.title ?? "Untitled",
@@ -80,6 +93,6 @@ export async function downloadToResponse(
 		});
 	} catch (e) {
 		await rm(dir, { recursive: true, force: true });
-		throw e;
+		throw friendly(e);
 	}
 }

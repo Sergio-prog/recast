@@ -1,4 +1,14 @@
 import { spawn } from "node:child_process";
+import { basename } from "node:path";
+
+export class ProcError extends Error {
+	detail: string;
+
+	constructor(message: string, detail: string) {
+		super(message);
+		this.detail = detail;
+	}
+}
 
 export function run(
 	cmd: string,
@@ -25,8 +35,11 @@ export function run(
 			if (code === 0) {
 				resolve(out);
 			} else {
-				const tail = err.trim().split("\n").slice(-6).join("\n");
-				reject(new Error(tail || `${cmd} exited with code ${code}`));
+				const detail = err.trim();
+				if (detail) console.error(`${cmd} failed (code ${code}):\n${detail}`);
+				reject(
+					new ProcError(`${basename(cmd)} exited with code ${code}`, detail),
+				);
 			}
 		});
 	});

@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { run } from "./proc";
+import { ProcError, run } from "./proc";
 
 const FFMPEG = process.env.FFMPEG_PATH ?? "ffmpeg";
 
@@ -145,7 +145,12 @@ export async function convertMedia(
 				outPath,
 			]);
 		} catch (e) {
-			const message = e instanceof Error ? e.message : String(e);
+			const detail =
+				e instanceof ProcError
+					? e.detail
+					: e instanceof Error
+						? e.message
+						: String(e);
 			const audioTarget = [
 				"mp3",
 				"wav",
@@ -157,7 +162,7 @@ export async function convertMedia(
 			].includes(dst);
 			if (
 				audioTarget &&
-				/does not contain any stream|Error opening output/i.test(message)
+				/does not contain any stream|Error opening output/i.test(detail)
 			) {
 				throw new Error("This file has no audio track to extract");
 			}
