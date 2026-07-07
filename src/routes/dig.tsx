@@ -63,12 +63,12 @@ function DigPage() {
 	const [result, setResult] = useState<DigResponse | null>(null);
 	const [resolver, setResolver] = useState<string | null>(null);
 
-	const lookup = async (nextType = type) => {
-		if (!domain.trim()) return;
+	const lookup = async (nextType = type, nextDomain = domain) => {
+		if (!nextDomain.trim()) return;
 		setWorking(true);
 		try {
 			const query = new URLSearchParams({
-				domain: domain.trim(),
+				domain: nextDomain.trim(),
 				type: nextType,
 				rdap: "1",
 			});
@@ -90,6 +90,14 @@ function DigPage() {
 		result?.records.find((r) => r.resolver === resolver) ??
 		answers[0] ??
 		result?.records[0];
+	const allEmpty =
+		result !== null &&
+		result.records.every((r) => r.error === "no records") &&
+		(result.type === "NS" || result.type === "SOA") &&
+		result.domain.split(".").length > 2;
+	const parentDomain = allEmpty
+		? result.domain.split(".").slice(1).join(".")
+		: null;
 
 	return (
 		<main className="mx-auto w-full max-w-4xl px-4 pb-20 pt-14">
@@ -250,6 +258,22 @@ function DigPage() {
 								)}
 							</CardContent>
 						</Card>
+					)}
+					{parentDomain && (
+						<p className="mt-3 text-sm text-muted-foreground">
+							That's expected for a subdomain — {result.type} records live at
+							the zone apex unless the subdomain is delegated as its own zone.{" "}
+							<button
+								type="button"
+								className="font-medium underline underline-offset-4 transition-colors hover:text-foreground"
+								onClick={() => {
+									setDomain(parentDomain);
+									void lookup(type, parentDomain);
+								}}
+							>
+								Dig {parentDomain}
+							</button>
+						</p>
 					)}
 					{result.whois && (
 						<Card className="mt-3 py-4">
