@@ -3,6 +3,16 @@
 Bun + TanStack Start. All tools run through server routes in `src/routes/api/` —
 no separate backend. UI is shadcn/ui, styles in `src/styles.css`.
 
+## This is a deployed, public app
+
+Recast runs at https://recast.serhiifotex.dev and is used by people other than
+the owner. Error responses and toasts must be written for end users: no stack
+traces, no file paths, no install/setup instructions ("run bunx …", "set
+CHROMIUM_PATH …"), no internal process names. Put the operator-facing detail in
+`console.error` (it lands in server logs) and return a short, plain sentence
+about what failed and what the user can do. `src/server/proc.ts` and
+`src/server/screenshot.ts` show the pattern.
+
 ## Commands
 
 ```sh
