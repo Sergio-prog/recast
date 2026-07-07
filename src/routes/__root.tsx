@@ -195,10 +195,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							<p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
 								recast.serhiifotex.dev
 							</p>
-							<p className="text-xs text-muted-foreground">
-								Files are processed on this machine — nothing is uploaded to a
-								third party.
-							</p>
+							<a
+								href="https://github.com/Sergio-prog/recast"
+								target="_blank"
+								rel="noreferrer"
+								className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+							>
+								Open source on GitHub
+							</a>
 						</div>
 					</footer>
 					<Toaster />
