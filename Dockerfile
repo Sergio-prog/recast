@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
-RUN bun run build
+RUN bun run vocabs && bun run build
 
 FROM oven/bun:1.3
 RUN apt-get update && apt-get install -y --no-install-recommends \

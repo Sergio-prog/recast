@@ -13,7 +13,8 @@
 
 <p align="center">
   <code>convert</code> · <code>pdf</code> · <code>paste</code> · <code>screenshot</code> ·
-  <code>dig</code> · <code>ip</code> · <code>speed</code> · <code>download</code> · <code>currency</code>
+  <code>tokenizer</code> · <code>dig</code> · <code>ip</code> · <code>speed</code> ·
+  <code>download</code> · <code>currency</code>
 </p>
 
 <p align="center">
@@ -50,6 +51,9 @@
   Google sign-in required to create
 - **Screenshot** — capture any URL as PNG/JPG with viewport presets, delay,
   full-page, dark mode and 2× retina
+- **Tokenizer** — count GPT, Claude, Gemini, DeepSeek, Kimi and GLM tokens
+  entirely in the browser, with per-token segmentation; vocabularies are
+  fetched by `bun run vocabs` and served as static gzipped files
 - **DNS dig** — any record type against four public resolvers at once, with
   propagation consistency check and RDAP registrar summary
 - **IP inspector** — your public address, ISP, geo and reverse DNS, plus what
@@ -99,10 +103,12 @@
 
 ```sh
 bun install
+bun run vocabs
 bun run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. `bun run vocabs` downloads the tokenizer
+vocabularies into `public/vocabs` (gitignored, ~13 MB once).
 
 Local requirements: [bun](https://bun.sh) ≥ 1.3, `ffmpeg` and `yt-dlp` on `PATH`
 (`brew install ffmpeg yt-dlp`), and `bsdtar` (preinstalled on macOS).

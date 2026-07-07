@@ -103,6 +103,7 @@ const NETWORK = [
 const TAIL_NAV = [
 	{ to: "/download", label: "Download" },
 	{ to: "/currency", label: "Currency" },
+	{ to: "/tokenizer", label: "Tokenizer" },
 ] as const;
 
 function NavLink({ to, label }: { to: string; label: string }) {

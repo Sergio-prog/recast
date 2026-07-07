@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideoRouteImport } from './routes/video'
+import { Route as TokenizerRouteImport } from './routes/tokenizer'
 import { Route as SpeedRouteImport } from './routes/speed'
 import { Route as ScreenshotRouteImport } from './routes/screenshot'
 import { Route as PdfRouteImport } from './routes/pdf'
@@ -37,6 +38,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
   path: '/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TokenizerRoute = TokenizerRouteImport.update({
+  id: '/tokenizer',
+  path: '/tokenizer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SpeedRoute = SpeedRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/pdf': typeof PdfRoute
   '/screenshot': typeof ScreenshotRoute
   '/speed': typeof SpeedRoute
+  '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/pdf': typeof PdfRoute
   '/screenshot': typeof ScreenshotRoute
   '/speed': typeof SpeedRoute
+  '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/pdf': typeof PdfRoute
   '/screenshot': typeof ScreenshotRoute
   '/speed': typeof SpeedRoute
+  '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/pdf'
     | '/screenshot'
     | '/speed'
+    | '/tokenizer'
     | '/video'
     | '/api/convert'
     | '/api/currency'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/pdf'
     | '/screenshot'
     | '/speed'
+    | '/tokenizer'
     | '/video'
     | '/api/convert'
     | '/api/currency'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/pdf'
     | '/screenshot'
     | '/speed'
+    | '/tokenizer'
     | '/video'
     | '/api/convert'
     | '/api/currency'
@@ -326,6 +338,7 @@ export interface RootRouteChildren {
   PdfRoute: typeof PdfRoute
   ScreenshotRoute: typeof ScreenshotRoute
   SpeedRoute: typeof SpeedRoute
+  TokenizerRoute: typeof TokenizerRoute
   VideoRoute: typeof VideoRoute
   ApiConvertRoute: typeof ApiConvertRoute
   ApiCurrencyRoute: typeof ApiCurrencyRoute
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/video'
       fullPath: '/video'
       preLoaderRoute: typeof VideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokenizer': {
+      id: '/tokenizer'
+      path: '/tokenizer'
+      fullPath: '/tokenizer'
+      preLoaderRoute: typeof TokenizerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/speed': {
@@ -537,6 +557,7 @@ const rootRouteChildren: RootRouteChildren = {
   PdfRoute: PdfRoute,
   ScreenshotRoute: ScreenshotRoute,
   SpeedRoute: SpeedRoute,
+  TokenizerRoute: TokenizerRoute,
   VideoRoute: VideoRoute,
   ApiConvertRoute: ApiConvertRoute,
   ApiCurrencyRoute: ApiCurrencyRoute,

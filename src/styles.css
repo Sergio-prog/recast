@@ -12,6 +12,13 @@
   --font-display: 'Bricolage Grotesque Variable', 'Inter Variable', sans-serif;
   --font-mono: 'Spline Sans Mono Variable', ui-monospace, 'SF Mono', monospace;
 
+  --color-tk0: rgba(255, 180, 84, 0.32);
+  --color-tk1: rgba(94, 234, 195, 0.3);
+  --color-tk2: rgba(125, 178, 255, 0.32);
+  --color-tk3: rgba(255, 138, 184, 0.3);
+  --color-tk4: rgba(196, 148, 255, 0.32);
+  --color-tk5: rgba(214, 235, 118, 0.3);
+
   --animate-roll-in: roll-in 0.55s cubic-bezier(0.3, 0.8, 0.2, 1) both;
   --animate-roll-out: roll-out 0.55s cubic-bezier(0.3, 0.8, 0.2, 1) both;
 
