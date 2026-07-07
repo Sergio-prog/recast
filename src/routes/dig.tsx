@@ -49,11 +49,19 @@ type DigResponse = {
 	} | null;
 };
 
+function parseRecord(record: string): { value: string; ttl: string | null } {
+	const match = record.match(/^(.*?)\s+·\s+TTL (\d+s)$/);
+	return match
+		? { value: match[1], ttl: match[2] }
+		: { value: record, ttl: null };
+}
+
 function DigPage() {
 	const [domain, setDomain] = useState("");
 	const [type, setType] = useState<(typeof RECORD_TYPES)[number]>("A");
 	const [working, setWorking] = useState(false);
 	const [result, setResult] = useState<DigResponse | null>(null);
+	const [resolver, setResolver] = useState<string | null>(null);
 
 	const lookup = async (nextType = type) => {
 		if (!domain.trim()) return;
@@ -78,6 +86,10 @@ function DigPage() {
 	const consistent =
 		answers.length > 1 &&
 		new Set(answers.map((r) => [...r.records].sort().join("\n"))).size === 1;
+	const selected =
+		result?.records.find((r) => r.resolver === resolver) ??
+		answers[0] ??
+		result?.records[0];
 
 	return (
 		<main className="mx-auto w-full max-w-4xl px-4 pb-20 pt-14">
@@ -150,36 +162,95 @@ function DigPage() {
 								</Badge>
 							))}
 					</div>
-					<div className="mt-3 grid gap-3 sm:grid-cols-2">
-						{result.records.map((r) => (
-							<Card key={r.resolver} className="py-4">
-								<CardHeader className="pb-0">
-									<CardTitle className="flex items-baseline justify-between font-mono text-xs uppercase tracking-widest">
-										{r.resolver}
-										<span className="text-muted-foreground">
-											{r.ip} · {r.ms}ms
-										</span>
-									</CardTitle>
-								</CardHeader>
-								<CardContent>
-									{r.error ? (
-										<p className="text-sm text-muted-foreground">{r.error}</p>
-									) : (
-										<ul className="flex flex-col gap-1">
-											{r.records.map((record) => (
-												<li
-													key={record}
-													className="break-all font-mono text-xs leading-relaxed"
-												>
-													{record}
-												</li>
-											))}
-										</ul>
-									)}
-								</CardContent>
-							</Card>
-						))}
+					<div className="mt-3 flex flex-wrap gap-1.5">
+						{result.records.map((r) => {
+							const active = r.resolver === selected?.resolver;
+							return (
+								<button
+									key={r.resolver}
+									type="button"
+									onClick={() => setResolver(r.resolver)}
+									className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-mono text-xs transition-colors ${
+										active
+											? "border-primary bg-primary text-primary-foreground"
+											: "text-muted-foreground hover:text-foreground"
+									}`}
+								>
+									<span
+										className={`size-1.5 rounded-full ${
+											r.error
+												? "bg-destructive"
+												: active
+													? "bg-primary-foreground/70"
+													: "bg-green-500"
+										}`}
+									/>
+									{r.resolver}
+									<span
+										className={
+											active ? "text-primary-foreground/70" : "opacity-60"
+										}
+									>
+										{r.error ? "error" : `${r.ms}ms`}
+									</span>
+								</button>
+							);
+						})}
 					</div>
+					{selected && (
+						<Card className="mt-3 py-4">
+							<CardHeader className="pb-0">
+								<CardTitle className="flex items-baseline justify-between font-mono text-xs uppercase tracking-widest">
+									{selected.resolver}
+									<span className="text-muted-foreground">
+										{selected.ip} · {selected.ms}ms
+									</span>
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								{selected.error ? (
+									<p className="text-sm text-muted-foreground">
+										{selected.error}
+									</p>
+								) : (
+									<div className="overflow-x-auto">
+										<table className="w-full">
+											<thead>
+												<tr className="border-b text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+													<th className="py-2 pr-4 font-medium">Type</th>
+													<th className="w-full py-2 pr-4 font-medium">
+														Value
+													</th>
+													<th className="py-2 text-right font-medium">TTL</th>
+												</tr>
+											</thead>
+											<tbody>
+												{selected.records.map((record) => {
+													const { value, ttl } = parseRecord(record);
+													return (
+														<tr
+															key={record}
+															className="border-b last:border-b-0"
+														>
+															<td className="py-2 pr-4 font-mono text-xs text-muted-foreground">
+																{result.type}
+															</td>
+															<td className="break-all py-2 pr-4 font-mono text-xs leading-relaxed">
+																{value}
+															</td>
+															<td className="whitespace-nowrap py-2 text-right font-mono text-xs text-muted-foreground">
+																{ttl ?? "—"}
+															</td>
+														</tr>
+													);
+												})}
+											</tbody>
+										</table>
+									</div>
+								)}
+							</CardContent>
+						</Card>
+					)}
 					{result.whois && (
 						<Card className="mt-3 py-4">
 							<CardHeader className="pb-0">
