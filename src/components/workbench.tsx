@@ -137,8 +137,21 @@ function JobRow({
 						</SelectContent>
 					</Select>
 					{hasQualityKnob(job.target) && (
-						<div className="flex w-32 items-center gap-2">
+						<div
+							className="w-40"
+							title="Drag to trade quality for file size — lower quality means a smaller file"
+						>
+							<div className="flex items-baseline justify-between">
+								<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+									Quality
+								</span>
+								<span className="font-mono text-xs tabular-nums">
+									{job.quality}%
+								</span>
+							</div>
 							<Slider
+								className="mt-1.5"
+								aria-label="Quality"
 								value={[job.quality]}
 								min={10}
 								max={100}
@@ -149,9 +162,10 @@ function JobRow({
 									})
 								}
 							/>
-							<span className="w-8 font-mono text-xs text-muted-foreground">
-								Q{job.quality}
-							</span>
+							<div className="mt-1 flex justify-between text-[9px] leading-none text-muted-foreground">
+								<span>smaller file</span>
+								<span>best quality</span>
+							</div>
 						</div>
 					)}
 					{job.status === "working" ? (
