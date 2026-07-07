@@ -12,4 +12,7 @@ services:
       MAX_DOWNLOAD_MB: ${MAX_DOWNLOAD_MB:-500}
       PASTE_MAX_KB: ${PASTE_MAX_KB:-256}
       TRUST_PROXY: ${TRUST_PROXY:-0}
+      YTDLP_COOKIES: ${YTDLP_COOKIES:-}
+    volumes:
+      - ./data:/data:ro
     restart: unless-stopped

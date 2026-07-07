@@ -154,6 +154,16 @@ docker compose up --build
 The image bundles FFmpeg, yt-dlp, bsdtar, libheif and Chromium. Configure via
 `.env` (picked up by compose) — see [.env.example](.env.example).
 
+Behind a reverse proxy set `TRUST_PROXY=1` (or leave it — the proxy is
+auto-detected when the socket peer is a private address) so the rate limiter
+and the IP tool see real client addresses from `x-forwarded-for`.
+
+YouTube blocks anonymous downloads from datacenter IPs ("Sign in to confirm
+you're not a bot"). To download from YouTube on a server, export cookies from
+a logged-in browser session ([yt-dlp guide](https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies)),
+drop the file at `./data/cookies.txt` (mounted read-only into the container)
+and set `YTDLP_COOKIES=/data/cookies.txt` in `.env`.
+
 ## Why
 
 Read [VISION.md](VISION.md) — the short version: every online converter asks

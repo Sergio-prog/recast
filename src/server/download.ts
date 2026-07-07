@@ -8,13 +8,26 @@ import { ProcError, run } from "./proc";
 
 const YTDLP = process.env.YTDLP_PATH ?? "yt-dlp";
 
+function cookieArgs(): Array<string> {
+	return process.env.YTDLP_COOKIES
+		? ["--cookies", process.env.YTDLP_COOKIES]
+		: [];
+}
+
 function friendly(e: unknown): Error {
 	if (e instanceof ProcError) {
 		const line = e.detail.match(/^ERROR:\s*(.+)$/m)?.[1];
-		return new Error(
-			line ??
+		if (!line) {
+			return new Error(
 				"Download failed — the site may be unsupported or the link invalid",
-		);
+			);
+		}
+		if (line.includes("Sign in to confirm")) {
+			return new Error(
+				"YouTube is blocking anonymous downloads from this server right now — try again later",
+			);
+		}
+		return new Error(line.split(/\s+Use --cookies|\s+See\s+https?:\/\//)[0]);
 	}
 	return e instanceof Error ? e : new Error(String(e));
 }
@@ -30,7 +43,7 @@ export type MediaInfo = {
 export async function fetchInfo(url: string): Promise<MediaInfo> {
 	const out = await run(
 		YTDLP,
-		["-J", "--no-playlist", "--no-warnings", url],
+		[...cookieArgs(), "-J", "--no-playlist", "--no-warnings", url],
 		60_000,
 	).catch((e: unknown) => {
 		throw friendly(e);
@@ -66,6 +79,7 @@ export async function downloadToResponse(
 		await run(
 			YTDLP,
 			[
+				...cookieArgs(),
 				...modeArgs,
 				...sizeArgs,
 				"--no-playlist",
