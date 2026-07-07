@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		libarchive-tools \
 		libheif-examples \
 		chromium \
-		python3-minimal \
+		python3 \
 		ca-certificates \
 		curl \
 	&& curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
