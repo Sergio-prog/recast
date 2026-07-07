@@ -2,23 +2,20 @@ import {
 	ArrowDownIcon,
 	ArrowUpIcon,
 	DownloadSimpleIcon,
-	FilePdfIcon,
+	ImagesIcon,
 	PlusIcon,
+	ScissorsIcon,
+	StackSimpleIcon,
 	XIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatBytes } from "@/lib/formats";
 
 export const Route = createFileRoute("/pdf")({
@@ -28,7 +25,7 @@ export const Route = createFileRoute("/pdf")({
 
 function PdfPage() {
 	return (
-		<main className="mx-auto w-full max-w-5xl px-4 pb-20 pt-14">
+		<main className="mx-auto w-full max-w-3xl px-4 pb-20 pt-14">
 			<p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
 				PDF tools
 			</p>
@@ -36,46 +33,62 @@ function PdfPage() {
 				Pages, assembled.
 			</h1>
 			<p className="mt-4 max-w-xl text-muted-foreground">
-				Merge PDFs, split them apart or bundle images into a single document.
-				For single-file conversions like PDF → PNG or JPG → PDF, drop the file
-				on the main workbench.
+				Three separate tools — pick the one you need. For single-file
+				conversions like PDF → PNG or JPG → PDF, drop the file on the main
+				workbench.
 			</p>
-			<div className="mt-8 grid gap-4 lg:grid-cols-3">
-				<PdfTool
-					op="merge"
-					title="Merge PDFs"
-					description="Combine two or more PDFs into one, in the order listed."
-					accept=".pdf"
-					multiple
-					cta="Merge"
-					minFiles={2}
-				/>
-				<PdfTool
-					op="split"
-					title="Split PDF"
-					description="Every page as its own PDF (zipped), or extract a page range like 1-3,5."
-					accept=".pdf"
-					cta="Split"
-					minFiles={1}
-					withRange
-				/>
-				<PdfTool
-					op="images"
-					title="Images to PDF"
-					description="Bundle JPG, PNG, WebP, HEIC and other images into one PDF, one page per image."
-					accept="image/*,.heic,.heif"
-					multiple
-					cta="Create PDF"
-					minFiles={1}
-				/>
-			</div>
+			<Tabs defaultValue="merge" className="mt-8">
+				<TabsList className="w-full sm:w-fit">
+					<TabsTrigger value="merge" className="px-4">
+						<StackSimpleIcon />
+						Merge
+					</TabsTrigger>
+					<TabsTrigger value="split" className="px-4">
+						<ScissorsIcon />
+						Split
+					</TabsTrigger>
+					<TabsTrigger value="images" className="px-4">
+						<ImagesIcon />
+						Images to PDF
+					</TabsTrigger>
+				</TabsList>
+				<TabsContent value="merge" keepMounted>
+					<PdfTool
+						op="merge"
+						description="Combine two or more PDFs into one, in the order listed."
+						accept=".pdf"
+						multiple
+						cta="Merge"
+						minFiles={2}
+					/>
+				</TabsContent>
+				<TabsContent value="split" keepMounted>
+					<PdfTool
+						op="split"
+						description="Every page as its own PDF (zipped), or extract a page range like 1-3,5."
+						accept=".pdf"
+						cta="Split"
+						minFiles={1}
+						withRange
+					/>
+				</TabsContent>
+				<TabsContent value="images" keepMounted>
+					<PdfTool
+						op="images"
+						description="Bundle JPG, PNG, WebP, HEIC and other images into one PDF, one page per image."
+						accept="image/*,.heic,.heif"
+						multiple
+						cta="Create PDF"
+						minFiles={1}
+					/>
+				</TabsContent>
+			</Tabs>
 		</main>
 	);
 }
 
 type PdfToolProps = {
 	op: "merge" | "split" | "images";
-	title: string;
 	description: string;
 	accept: string;
 	cta: string;
@@ -86,7 +99,6 @@ type PdfToolProps = {
 
 function PdfTool({
 	op,
-	title,
 	description,
 	accept,
 	cta,
@@ -139,15 +151,9 @@ function PdfTool({
 	};
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest">
-					<FilePdfIcon className="size-4" />
-					{title}
-				</CardTitle>
-				<CardDescription>{description}</CardDescription>
-			</CardHeader>
-			<CardContent className="flex flex-1 flex-col gap-3">
+		<Card className="mt-2">
+			<CardContent className="flex flex-col gap-3">
+				<p className="text-sm text-muted-foreground">{description}</p>
 				{files.length > 0 && (
 					<ul className="flex flex-col gap-1">
 						{files.map(({ id, file }, index) => (
@@ -229,7 +235,7 @@ function PdfTool({
 						className="h-8 font-mono text-xs"
 					/>
 				)}
-				<div className="mt-auto flex items-center gap-2 pt-1">
+				<div className="flex items-center gap-2 pt-1">
 					<Button
 						size="sm"
 						disabled={working || files.length < minFiles}
