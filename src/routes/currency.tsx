@@ -12,6 +12,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/currency")({
 	head: () => ({ meta: [{ title: "Currency converter — Recast" }] }),
@@ -169,21 +170,34 @@ function CurrencyPage() {
 					</div>
 					{error ? (
 						<p className="text-sm text-destructive">{error}</p>
+					) : rate === undefined ? (
+						<div>
+							<Skeleton className="h-10 w-64 sm:h-12" />
+							<Skeleton className="mt-3 h-3.5 w-52" />
+						</div>
 					) : (
 						<div>
 							<p className="font-mono text-4xl font-medium tracking-tight sm:text-5xl">
 								{result === null ? "—" : `${fmt(result)} ${to}`}
 							</p>
-							{rate !== undefined && (
-								<p className="mt-2 font-mono text-xs text-muted-foreground">
-									1 {from} = {fmt(rate, 4)} {to}
-									{data ? ` · ${data.updated.slice(0, 16)}` : ""}
-								</p>
-							)}
+							<p className="mt-2 font-mono text-xs text-muted-foreground">
+								1 {from} = {fmt(rate, 4)} {to}
+								{data ? ` · ${data.updated.slice(0, 16)}` : ""}
+							</p>
 						</div>
 					)}
 				</CardContent>
 			</Card>
+			{!data && !error && (
+				<div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+					{FEATURED.slice(0, 4).map((code) => (
+						<div key={code} className="rounded-lg border bg-card p-3">
+							<Skeleton className="h-3.5 w-10" />
+							<Skeleton className="mt-2 h-4 w-20" />
+						</div>
+					))}
+				</div>
+			)}
 			{data && result !== null && (
 				<div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
 					{FEATURED.filter(

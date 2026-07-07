@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
 import { formatBytes } from "@/lib/formats";
 
@@ -162,9 +162,18 @@ function PasteViewPage() {
 					</p>
 				</>
 			) : (
-				<div className="flex justify-center pt-10">
-					<Spinner className="size-6" />
-				</div>
+				<>
+					<p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+						Paste
+					</p>
+					<Skeleton className="mt-3 h-9 w-64 max-w-full" />
+					<div className="mt-4 flex gap-2">
+						<Skeleton className="h-5 w-16" />
+						<Skeleton className="h-5 w-20" />
+						<Skeleton className="h-5 w-40" />
+					</div>
+					<Skeleton className="mt-5 h-56 w-full rounded-xl" />
+				</>
 			)}
 		</main>
 	);

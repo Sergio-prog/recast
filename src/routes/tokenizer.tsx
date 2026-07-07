@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounced } from "@/hooks/use-debounced";
 import { loadModel, MODELS } from "@/lib/tokenizers/registry";
 import type {
@@ -39,7 +40,9 @@ function TokenizerPage() {
 	const [selectedId, setSelectedId] = useState(() => {
 		if (typeof window === "undefined") return MODELS[0].id;
 		const saved = localStorage.getItem("recast:tokenizer:model");
-		return MODELS.some((m) => m.id === saved) ? (saved as string) : MODELS[0].id;
+		return MODELS.some((m) => m.id === saved)
+			? (saved as string)
+			: MODELS[0].id;
 	});
 	const [states, setStates] = useState<Record<string, ModelStatus>>(() =>
 		Object.fromEntries(MODELS.map((m) => [m.id, "idle"])),
@@ -172,9 +175,13 @@ function TokenizerPage() {
 							</>
 						)}
 						{status === "loading" && (
-							<span className="animate-pulse self-center font-mono text-sm text-muted-foreground">
-								loading {selected.label} vocabulary ({selected.sizeLabel})…
-							</span>
+							<>
+								<Skeleton className="h-9 w-24 self-center" />
+								<span className="self-center font-mono text-xs text-muted-foreground">
+									downloading {selected.label} vocabulary ({selected.sizeLabel}
+									)…
+								</span>
+							</>
 						)}
 						{status === "error" && (
 							<span className="flex items-center gap-2 self-center text-sm text-destructive">
@@ -198,6 +205,20 @@ function TokenizerPage() {
 					</p>
 				</CardContent>
 			</Card>
+			{status === "loading" && debouncedText.length > 0 && (
+				<Card className="mt-3 gap-3 py-4">
+					<CardHeader className="pb-0">
+						<CardTitle className="font-mono text-xs uppercase tracking-widest">
+							Segmentation
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Skeleton className="h-4 w-full" />
+						<Skeleton className="mt-2.5 h-4 w-5/6" />
+						<Skeleton className="mt-2.5 h-4 w-2/3" />
+					</CardContent>
+				</Card>
+			)}
 			{status === "ready" && result !== null && result.count > 0 && (
 				<Card className="mt-3 gap-3 py-4">
 					<CardHeader className="pb-0">

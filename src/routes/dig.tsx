@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 
 export const Route = createFileRoute("/dig")({
@@ -148,6 +149,24 @@ function DigPage() {
 					</button>
 				))}
 			</div>
+			{working && !result && (
+				<div className="mt-8">
+					<Skeleton className="h-4 w-44" />
+					<div className="mt-4 flex flex-wrap gap-1.5">
+						{["cloudflare", "google", "quad9", "opendns"].map((key) => (
+							<Skeleton key={key} className="h-8 w-32 rounded-md" />
+						))}
+					</div>
+					<Card className="mt-3 py-4">
+						<CardContent>
+							<Skeleton className="h-3.5 w-full max-w-64" />
+							{["one", "two", "three"].map((key) => (
+								<Skeleton key={key} className="mt-3 h-4 w-full" />
+							))}
+						</CardContent>
+					</Card>
+				</div>
+			)}
 			{result && (
 				<>
 					<div className="mt-8 flex items-center gap-2">

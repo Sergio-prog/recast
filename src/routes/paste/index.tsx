@@ -26,6 +26,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
@@ -138,13 +139,13 @@ function SignedIn({ name }: { name: string }) {
 	const [expiry, setExpiry] = useState("7d");
 	const [content, setContent] = useState("");
 	const [busy, setBusy] = useState(false);
-	const [mine, setMine] = useState<Array<PasteSummary>>([]);
+	const [mine, setMine] = useState<Array<PasteSummary> | null>(null);
 
 	const loadMine = () => {
 		fetch("/api/paste")
 			.then((res) => (res.ok ? res.json() : []))
 			.then(setMine)
-			.catch(() => {});
+			.catch(() => setMine([]));
 	};
 	useEffect(loadMine, []);
 
@@ -313,7 +314,7 @@ function SignedIn({ name }: { name: string }) {
 					</div>
 				</CardContent>
 			</Card>
-			{mine.length > 0 && (
+			{(mine === null || mine.length > 0) && (
 				<Card className="mt-6">
 					<CardHeader>
 						<CardTitle className="font-mono text-sm uppercase tracking-widest">
@@ -325,7 +326,18 @@ function SignedIn({ name }: { name: string }) {
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-col">
-						{mine.map((paste) => (
+						{mine === null &&
+							["one", "two", "three"].map((key) => (
+								<div
+									key={key}
+									className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
+								>
+									<Skeleton className="h-4 w-full max-w-48" />
+									<Skeleton className="ml-auto h-4 w-14" />
+									<Skeleton className="h-4 w-20" />
+								</div>
+							))}
+						{(mine ?? []).map((paste) => (
 							<div
 								key={paste.id}
 								className="flex items-center gap-3 border-b py-2 last:border-b-0"

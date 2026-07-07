@@ -2,7 +2,7 @@ import { DesktopIcon, GlobeIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/ip")({
 	head: () => ({ meta: [{ title: "My IP — Recast" }] }),
@@ -76,7 +76,16 @@ function IpPage() {
 							unreachable.
 						</p>
 					) : !info ? (
-						<Spinner className="size-5" />
+						<div className="flex flex-col gap-4">
+							<Skeleton className="h-9 w-72 max-w-full sm:h-10" />
+							<dl className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+								{["location", "isp", "org", "asn", "timezone", "reverse"].map(
+									(key) => (
+										<Skeleton key={key} className="h-4 w-full max-w-56" />
+									),
+								)}
+							</dl>
+						</div>
 					) : (
 						<div className="flex flex-col gap-4">
 							<p className="font-mono text-3xl font-medium tracking-tight sm:text-4xl">
