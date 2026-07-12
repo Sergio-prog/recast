@@ -1,0 +1,23 @@
+# Recast
+
+> Recast is an open-source, self-hosted browser toolbench for private file conversion and everyday web utilities.
+
+Recast processes uploaded files on the operator's own server. It includes image, audio, video, archive and PDF conversion, plus website screenshots, a media downloader, tokenizer, DNS lookup, IP inspector, speed test, pastebin and currency conversion.
+
+## Main tools
+
+- [Universal converter](https://recast.serhiifotex.dev/): Convert mixed files with per-file output format and quality controls.
+- [Image converter](https://recast.serhiifotex.dev/images): Convert JPG, PNG, WebP, AVIF, GIF, TIFF, BMP, HEIC and SVG; supports image-to-PDF and GIF-to-video workflows.
+- [Video converter](https://recast.serhiifotex.dev/video): Convert MP4, WebM, MOV, MKV, AVI, FLV, MPEG, 3GP and MPEG-TS; create GIFs or extract audio.
+- [Audio converter](https://recast.serhiifotex.dev/audio): Convert MP3, WAV, OGG, Opus, FLAC, AAC, M4A, AIFF, WMA and AC-3.
+- [PDF tools](https://recast.serhiifotex.dev/pdf): Merge and split PDFs or convert between PDFs and images.
+- [Website screenshot](https://recast.serhiifotex.dev/screenshot): Capture web pages as PNG or JPEG with viewport, delay, full-page, color-scheme and scale controls.
+- [Tokenizer](https://recast.serhiifotex.dev/tokenizer): Count and inspect tokens for major language-model families in the browser.
+- [Network tools](https://recast.serhiifotex.dev/dig): DNS lookup, IP inspection and a browser-to-server speed test.
+- [Pastebin](https://recast.serhiifotex.dev/paste): Create private or link-accessible text pastes.
+
+## Project
+
+- [Source code](https://github.com/Sergio-prog/recast)
+- [Project vision](https://github.com/Sergio-prog/recast/blob/main/VISION.md)
+- [README](https://github.com/Sergio-prog/recast/blob/main/README.md)
