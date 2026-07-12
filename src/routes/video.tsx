@@ -8,7 +8,7 @@ export const Route = createFileRoute("/video")({
 			category="video"
 			eyebrow="Video converter"
 			title="Motion, remuxed."
-			copy="MP4, WebM, MOV, MKV and AVI both ways, video to GIF with a proper two-pass palette, and audio extraction straight to MP3 and friends. The quality knob maps to CRF for smaller files."
+			copy="Convert modern, legacy and mobile video formats, create a two-pass GIF, or extract the audio track. The quality control maps to efficient codec settings for smaller files."
 		/>
 	),
 });

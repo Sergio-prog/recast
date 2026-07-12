@@ -85,6 +85,62 @@ function argsFor(dst: string, quality: number): Array<string> {
 				"-b:a",
 				audioKbps,
 			];
+		case "flv":
+			return [
+				"-c:v",
+				"flv",
+				"-q:v",
+				"5",
+				"-c:a",
+				"libmp3lame",
+				"-b:a",
+				audioKbps,
+			];
+		case "mpg":
+			return [
+				"-vf",
+				EVEN_SCALE,
+				"-c:v",
+				"mpeg2video",
+				"-q:v",
+				"4",
+				"-c:a",
+				"mp2",
+				"-b:a",
+				"192k",
+			];
+		case "3gp":
+			return [
+				"-vf",
+				EVEN_SCALE,
+				"-c:v",
+				"libx264",
+				"-profile:v",
+				"baseline",
+				"-level",
+				"3.0",
+				"-c:a",
+				"aac",
+				"-b:a",
+				audioKbps,
+			];
+		case "ts":
+			return [
+				"-vf",
+				EVEN_SCALE,
+				"-c:v",
+				"libx264",
+				"-crf",
+				String(crf),
+				"-preset",
+				"veryfast",
+				"-c:a",
+				"aac",
+				"-b:a",
+				audioKbps,
+				"-f",
+				"mpegts",
+			];
 		case "gif": {
 			const width = quality >= 80 ? 640 : quality >= 50 ? 480 : 360;
 			const fps = quality >= 80 ? 15 : 12;
@@ -108,6 +164,12 @@ function argsFor(dst: string, quality: number): Array<string> {
 		case "aac":
 		case "m4a":
 			return ["-vn", "-c:a", "aac", "-b:a", audioKbps];
+		case "aiff":
+			return ["-vn", "-c:a", "pcm_s16be"];
+		case "wma":
+			return ["-vn", "-c:a", "wmav2", "-b:a", audioKbps];
+		case "ac3":
+			return ["-vn", "-c:a", "ac3", "-b:a", audioKbps];
 		case "jpg":
 			return [
 				"-frames:v",
@@ -159,6 +221,9 @@ export async function convertMedia(
 				"flac",
 				"aac",
 				"m4a",
+				"aiff",
+				"wma",
+				"ac3",
 			].includes(dst);
 			if (
 				audioTarget &&

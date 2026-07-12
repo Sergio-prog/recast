@@ -8,7 +8,7 @@ export const Route = createFileRoute("/audio")({
 			category="audio"
 			eyebrow="Audio converter"
 			title="Sound, resampled."
-			copy="MP3, WAV, OGG, Opus, FLAC, AAC and M4A in any direction. The quality knob sets the bitrate — drag it down to shrink podcasts and voice notes."
+			copy="Convert compressed, lossless and legacy audio formats in any direction. Lower the quality control to shrink podcasts, music and voice notes."
 		/>
 	),
 });

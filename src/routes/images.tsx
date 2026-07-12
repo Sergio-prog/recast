@@ -8,7 +8,7 @@ export const Route = createFileRoute("/images")({
 			category="image"
 			eyebrow="Image converter"
 			title="Pictures, repacked."
-			copy="JPG, PNG, WebP, AVIF, GIF, TIFF and BMP both ways — plus HEIC and SVG input, image to PDF, and GIF to video. Lower the quality knob to compress without changing format."
+			copy="Convert common web, camera and print image formats, turn images into PDFs, or move an animated GIF to video. Lower the quality control to reduce file size."
 		/>
 	),
 });
