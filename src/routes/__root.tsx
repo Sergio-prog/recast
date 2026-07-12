@@ -17,6 +17,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "next-themes";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -81,8 +82,37 @@ export const Route = createRootRoute({
 			],
 		};
 	},
+	notFoundComponent: NotFoundPage,
 	shellComponent: RootDocument,
 });
+
+function NotFoundPage() {
+	return (
+		<main className="mx-auto flex min-h-[calc(100svh-8.5rem)] w-full max-w-5xl items-center px-4 py-16">
+			<div className="grid w-full items-end gap-10 border-y py-12 sm:grid-cols-[1fr_auto] sm:py-16">
+				<div>
+					<p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+						404 · Unknown format
+					</p>
+					<h1 className="mt-4 max-w-2xl font-display text-5xl font-semibold leading-[0.95] tracking-tight sm:text-7xl">
+						This page didn’t convert.
+					</h1>
+					<p className="mt-6 max-w-lg text-muted-foreground">
+						The address may be outdated or mistyped. Return to the workbench and
+						choose the tool you need.
+					</p>
+				</div>
+				<Button
+					render={
+						<Link to="/">
+							Open converter <ArrowRightIcon />
+						</Link>
+					}
+				/>
+			</div>
+		</main>
+	);
+}
 
 const NAV = [
 	{ to: "/", label: "Convert" },
