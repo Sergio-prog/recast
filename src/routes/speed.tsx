@@ -2,9 +2,10 @@ import { GaugeIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Speedometer } from "@/components/speedometer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { measureDownload, measureUpload } from "@/lib/speed-test";
 
 export const Route = createFileRoute("/speed")({
 	head: () => ({ meta: [{ title: "Speed test — Recast" }] }),
@@ -27,48 +28,14 @@ const EMPTY: Results = {
 	upMbps: null,
 };
 
-const MB = 1024 * 1024;
-
-function makePayload(bytes: number): Uint8Array<ArrayBuffer> {
-	const chunk = new Uint8Array(65536);
-	crypto.getRandomValues(chunk);
-	const payload = new Uint8Array(bytes);
-	for (let offset = 0; offset < bytes; offset += chunk.length) {
-		payload.set(
-			chunk.subarray(0, Math.min(chunk.length, bytes - offset)),
-			offset,
-		);
-	}
-	return payload;
-}
-
-async function timedDownload(bytes: number): Promise<number> {
-	const started = performance.now();
-	const res = await fetch(`/api/speed?bytes=${bytes}`);
-	if (!res.ok || !res.body) throw new Error(await res.text());
-	const reader = res.body.getReader();
-	while (true) {
-		const { done } = await reader.read();
-		if (done) break;
-	}
-	return (performance.now() - started) / 1000;
-}
-
-async function timedUpload(bytes: number): Promise<number> {
-	const payload = makePayload(bytes);
-	const started = performance.now();
-	const res = await fetch("/api/speed", { method: "POST", body: payload });
-	if (!res.ok) throw new Error(await res.text());
-	await res.json();
-	return (performance.now() - started) / 1000;
-}
-
 function SpeedPage() {
 	const [phase, setPhase] = useState<Phase>("idle");
 	const [results, setResults] = useState<Results>(EMPTY);
+	const [liveMbps, setLiveMbps] = useState(0);
 
 	const run = async () => {
 		setResults(EMPTY);
+		setLiveMbps(0);
 		try {
 			setPhase("ping");
 			const samples: Array<number> = [];
@@ -89,32 +56,20 @@ function SpeedPage() {
 			}));
 
 			setPhase("download");
-			await timedDownload(2 * MB);
-			let downBytes = 16 * MB;
-			let downSeconds = await timedDownload(downBytes);
-			if (downSeconds < 1.2) {
-				const extra = 64 * MB;
-				downSeconds += await timedDownload(extra);
-				downBytes += extra;
-			}
+			const downMbps = await measureDownload(setLiveMbps);
 			setResults((r) => ({
 				...r,
-				downMbps: Math.round(((downBytes * 8) / downSeconds / 1e6) * 10) / 10,
+				downMbps: Math.round(downMbps * 10) / 10,
 			}));
 
 			setPhase("upload");
-			await timedUpload(1 * MB);
-			let upBytes = 8 * MB;
-			let upSeconds = await timedUpload(upBytes);
-			if (upSeconds < 1.2) {
-				const extra = 32 * MB;
-				upSeconds += await timedUpload(extra);
-				upBytes += extra;
-			}
+			setLiveMbps(0);
+			const upMbps = await measureUpload(setLiveMbps);
 			setResults((r) => ({
 				...r,
-				upMbps: Math.round(((upBytes * 8) / upSeconds / 1e6) * 10) / 10,
+				upMbps: Math.round(upMbps * 10) / 10,
 			}));
+			setLiveMbps(0);
 			setPhase("done");
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : "Speed test failed");
@@ -123,9 +78,21 @@ function SpeedPage() {
 	};
 
 	const running = phase !== "idle" && phase !== "done";
+	const gaugeValue =
+		phase === "download" || phase === "upload"
+			? liveMbps
+			: phase === "done"
+				? (results.downMbps ?? 0)
+				: 0;
+	const gaugeLabel =
+		phase === "upload"
+			? "Upload"
+			: phase === "ping"
+				? "Measuring latency"
+				: "Download";
 
 	return (
-		<main className="mx-auto w-full max-w-3xl px-4 pb-20 pt-14">
+		<main className="mx-auto w-full max-w-4xl px-4 pb-20 pt-14">
 			<p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
 				Speed test
 			</p>
@@ -137,8 +104,13 @@ function SpeedPage() {
 				ping, download and upload. Self-hosted, so no third-party test servers
 				involved.
 			</p>
-			<Card className="mt-8">
-				<CardContent className="flex flex-col gap-8 py-2">
+			<section className="mt-8 border-y py-8 sm:py-10">
+				<Speedometer
+					value={gaugeValue}
+					label={gaugeLabel}
+					active={phase === "download" || phase === "upload"}
+				/>
+				<div className="mx-auto mt-8 flex max-w-2xl flex-col gap-8">
 					<div className="grid grid-cols-3 gap-4">
 						<Stat
 							label="ping"
@@ -164,7 +136,7 @@ function SpeedPage() {
 							active={phase === "upload"}
 						/>
 					</div>
-					<div>
+					<div className="text-center">
 						<Button size="lg" disabled={running} onClick={() => void run()}>
 							{running ? <Spinner /> : <GaugeIcon />}
 							{phase === "done"
@@ -174,8 +146,8 @@ function SpeedPage() {
 									: "Run test"}
 						</Button>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</section>
 		</main>
 	);
 }

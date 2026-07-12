@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { createFileRoute } from "@tanstack/react-router";
 
 const CHUNK = randomBytes(65536);
-const MAX_BYTES = 128 * 1024 * 1024;
+const MAX_BYTES = 1024 * 1024 * 1024;
 
 export const Route = createFileRoute("/api/speed")({
 	server: {
@@ -39,6 +39,8 @@ export const Route = createFileRoute("/api/speed")({
 						"content-type": "application/octet-stream",
 						"content-length": String(bytes),
 						"cache-control": "no-store",
+						"content-encoding": "identity",
+						"x-content-type-options": "nosniff",
 					},
 				});
 			},
