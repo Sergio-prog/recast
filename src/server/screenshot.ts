@@ -44,7 +44,7 @@ export async function captureScreenshot(
 		browser = await getBrowser();
 	} catch (e) {
 		console.error(
-			"[screenshot] Chromium failed to launch. Install it with: bunx playwright-core install chromium-headless-shell — or point CHROMIUM_PATH at a Chrome/Chromium binary.",
+			"[screenshot] Chromium failed to launch. Verify the Playwright browser installation and container dependencies.",
 			e,
 		);
 		throw new Error(

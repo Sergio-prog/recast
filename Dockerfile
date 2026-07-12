@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		ffmpeg \
 		libarchive-tools \
 		libheif-examples \
-		chromium \
 		python3 \
 		ca-certificates \
 		curl \
@@ -23,10 +22,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY package.json bun.lock server.mjs ./
 RUN bun install --frozen-lockfile --production
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN bunx playwright-core install --with-deps chromium-headless-shell
 COPY --from=build /app/dist ./dist
 ENV NODE_ENV=production \
 	PORT=3000 \
-	CHROMIUM_PATH=/usr/bin/chromium \
 	CHROMIUM_NO_SANDBOX=1
 EXPOSE 3000
 CMD ["bun", "server.mjs"]
