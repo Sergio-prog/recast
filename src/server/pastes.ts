@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import type { PasteSearchFilters } from "@/lib/paste-search";
 import { getPool } from "./auth";
 
 let schemaReady: Promise<void> | null = null;
@@ -20,6 +21,9 @@ function init(): Promise<void> {
 		)`);
 		await pool.query(
 			"CREATE INDEX IF NOT EXISTS paste_user ON paste (user_id, created_at DESC)",
+		);
+		await pool.query(
+			"CREATE INDEX IF NOT EXISTS paste_tags_gin ON paste USING GIN (tags)",
 		);
 	})();
 	return schemaReady;
@@ -110,17 +114,42 @@ export async function getPaste(id: string): Promise<Paste | null> {
 
 export async function listPastes(
 	userId: string,
+	filters: PasteSearchFilters = {},
 ): Promise<Array<Omit<Paste, "content">>> {
 	await init();
 	await sweepExpired();
-	const { rows } = await getPool().query<PasteRow>(
-		"SELECT * FROM paste WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100",
-		[userId],
-	);
-	return rows.map((row) => {
-		const { content: _content, ...rest } = toPaste(row);
-		return rest;
-	});
+	const columns =
+		"id, user_id, name, description, tags, language, visibility, created_at, expires_at";
+	let sql = `SELECT ${columns} FROM paste WHERE user_id = $1 ORDER BY created_at DESC LIMIT 100`;
+	let values: Array<string> = [userId];
+	if (filters.q && filters.tag) {
+		sql = `SELECT ${columns} FROM paste WHERE user_id = $1 AND (name ILIKE $2 OR description ILIKE $2) AND tags ? $3 ORDER BY created_at DESC LIMIT 100`;
+		values = [userId, `%${filters.q}%`, filters.tag];
+	} else if (filters.q) {
+		sql = `SELECT ${columns} FROM paste WHERE user_id = $1 AND (name ILIKE $2 OR description ILIKE $2) ORDER BY created_at DESC LIMIT 100`;
+		values = [userId, `%${filters.q}%`];
+	} else if (filters.tag) {
+		sql = `SELECT ${columns} FROM paste WHERE user_id = $1 AND tags ? $2 ORDER BY created_at DESC LIMIT 100`;
+		values = [userId, filters.tag];
+	}
+	const { rows } = await getPool().query<PasteSummaryRow>(sql, values);
+	return rows.map(toPasteSummary);
+}
+
+type PasteSummaryRow = Omit<PasteRow, "content">;
+
+function toPasteSummary(row: PasteSummaryRow): Omit<Paste, "content"> {
+	return {
+		id: row.id,
+		userId: row.user_id,
+		name: row.name,
+		description: row.description,
+		tags: row.tags,
+		language: row.language,
+		visibility: row.visibility === "private" ? "private" : "unlisted",
+		createdAt: Number(row.created_at),
+		expiresAt: row.expires_at === null ? null : Number(row.expires_at),
+	};
 }
 
 export async function deletePaste(

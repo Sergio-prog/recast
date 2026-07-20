@@ -4,12 +4,17 @@ export const Route = createFileRoute("/api/paste")({
 	server: {
 		handlers: {
 			GET: async ({ request }) => {
+				const { parsePasteSearch } = await import("@/lib/paste-search");
+				const parsed = parsePasteSearch(new URL(request.url).searchParams);
+				if (!parsed.ok) {
+					return new Response(parsed.error, { status: 400 });
+				}
 				const { dbConfigured, sessionUser } = await import("@/server/auth");
 				if (!dbConfigured) return dbMissing();
 				const user = await sessionUser(request);
 				if (!user) return new Response("Sign in required", { status: 401 });
 				const { listPastes } = await import("@/server/pastes");
-				return Response.json(await listPastes(user.id));
+				return Response.json(await listPastes(user.id, parsed.filters));
 			},
 			POST: async ({ request }) => {
 				const { maxPasteBytes, rateLimit, tooLarge } = await import(

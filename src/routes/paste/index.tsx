@@ -3,20 +3,13 @@ import {
 	LinkIcon,
 	LockSimpleIcon,
 	SignOutIcon,
-	TrashIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
+import { PasteList } from "@/components/paste-list";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,7 +19,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
@@ -57,15 +49,6 @@ const EXPIRIES = [
 	{ value: "30d", label: "30 days" },
 	{ value: "never", label: "Never" },
 ];
-
-type PasteSummary = {
-	id: string;
-	name: string;
-	tags: Array<string>;
-	visibility: "unlisted" | "private";
-	createdAt: number;
-	expiresAt: number | null;
-};
 
 function PastePage() {
 	const { data: session, isPending } = authClient.useSession();
@@ -139,15 +122,6 @@ function SignedIn({ name }: { name: string }) {
 	const [expiry, setExpiry] = useState("7d");
 	const [content, setContent] = useState("");
 	const [busy, setBusy] = useState(false);
-	const [mine, setMine] = useState<Array<PasteSummary> | null>(null);
-
-	const loadMine = () => {
-		fetch("/api/paste")
-			.then((res) => (res.ok ? res.json() : []))
-			.then(setMine)
-			.catch(() => setMine([]));
-	};
-	useEffect(loadMine, []);
 
 	const create = async () => {
 		setBusy(true);
@@ -314,74 +288,7 @@ function SignedIn({ name }: { name: string }) {
 					</div>
 				</CardContent>
 			</Card>
-			{(mine === null || mine.length > 0) && (
-				<Card className="mt-6">
-					<CardHeader>
-						<CardTitle className="font-mono text-sm uppercase tracking-widest">
-							Your pastes
-						</CardTitle>
-						<CardDescription>
-							Only you can see this list. Unlisted pastes are readable by anyone
-							with the link.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="flex flex-col">
-						{mine === null &&
-							["one", "two", "three"].map((key) => (
-								<div
-									key={key}
-									className="flex items-center gap-3 border-b py-2.5 last:border-b-0"
-								>
-									<Skeleton className="h-4 w-full max-w-48" />
-									<Skeleton className="ml-auto h-4 w-14" />
-									<Skeleton className="h-4 w-20" />
-								</div>
-							))}
-						{(mine ?? []).map((paste) => (
-							<div
-								key={paste.id}
-								className="flex items-center gap-3 border-b py-2 last:border-b-0"
-							>
-								<a
-									href={`/paste/${paste.id}`}
-									className="min-w-0 flex-1 truncate text-sm font-medium underline-offset-4 hover:underline"
-								>
-									{paste.name}
-								</a>
-								{paste.tags.slice(0, 3).map((tag) => (
-									<Badge
-										key={tag}
-										variant="secondary"
-										className="font-mono text-[10px]"
-									>
-										{tag}
-									</Badge>
-								))}
-								<Badge
-									variant="outline"
-									className="font-mono text-[10px] uppercase"
-								>
-									{paste.visibility === "private" ? "private" : "link"}
-								</Badge>
-								<span className="font-mono text-xs text-muted-foreground">
-									{new Date(paste.createdAt).toLocaleDateString()}
-								</span>
-								<Button
-									variant="ghost"
-									size="icon-xs"
-									aria-label={`Delete ${paste.name}`}
-									onClick={async () => {
-										await fetch(`/api/paste/${paste.id}`, { method: "DELETE" });
-										loadMine();
-									}}
-								>
-									<TrashIcon />
-								</Button>
-							</div>
-						))}
-					</CardContent>
-				</Card>
-			)}
+			<PasteList />
 		</>
 	);
 }

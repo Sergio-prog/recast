@@ -6,7 +6,7 @@ import {
 	TrashIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/auth-client";
 import { formatBytes } from "@/lib/formats";
+
+const HighlightedCode = lazy(() =>
+	import("@/components/highlighted-code").then((module) => ({
+		default: module.HighlightedCode,
+	})),
+);
 
 export const Route = createFileRoute("/paste/$id")({
 	head: () => ({ meta: [{ title: "Paste — Recast" }] }),
@@ -150,9 +156,18 @@ function PasteViewPage() {
 					</div>
 					<Card className="mt-5 py-0">
 						<CardContent className="overflow-x-auto p-0">
-							<pre className="min-w-0 p-4 font-mono text-sm leading-relaxed">
-								{paste.content}
-							</pre>
+							<Suspense
+								fallback={
+									<pre className="min-w-0 whitespace-pre p-4 font-mono text-sm leading-relaxed">
+										{paste.content}
+									</pre>
+								}
+							>
+								<HighlightedCode
+									content={paste.content}
+									language={paste.language}
+								/>
+							</Suspense>
 						</CardContent>
 					</Card>
 					<p className="mt-4 text-xs text-muted-foreground">
