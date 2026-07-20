@@ -7,8 +7,8 @@
 > `plans/README.md`.
 >
 > **Drift check (run first)**:
-> `git diff --stat d125c71..HEAD -- package.json bun.lock src/components/workbench.tsx src/hooks/use-workbench.ts src/lib/download-zip.ts src/lib/download-zip.test.ts`
-> Then run the same command without `d125c71..HEAD` to detect uncommitted
+> `git diff --stat 1cc4389..HEAD -- package.json bun.lock src/components/workbench.tsx src/hooks/use-workbench.ts src/lib/download-zip.ts src/lib/download-zip.test.ts`
+> Then run the same command without `1cc4389..HEAD` to detect uncommitted
 > overlap. If an in-scope file changed, compare the excerpts below with live
 > code; a semantic mismatch is a STOP condition.
 
@@ -19,7 +19,7 @@
 - **Risk**: MED — large batches can create browser memory pressure
 - **Depends on**: none
 - **Category**: direction
-- **Planned at**: commit `d125c71`, 2026-07-12
+- **Planned at**: commit `1cc4389`, refreshed 2026-07-20
 
 ## Why this matters
 
@@ -222,4 +222,3 @@ Stop and report if:
 - Review memory behavior with several large outputs; the selected ZIP library
   must not eagerly materialize every entry as an `ArrayBuffer`.
 - Plan 002 also changes the `Job` model and should be rebased after this plan.
-

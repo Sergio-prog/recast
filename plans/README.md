@@ -20,6 +20,16 @@ its STOP conditions, and update its row when done.
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale)
 
+## Reconciliation notes
+
+- 2026-07-20 at `1cc4389`: plan 004 verified DONE. Its in-scope source is
+  byte-identical to the reviewed implementation worktree, where all 22 targeted
+  tests pass. The main checkout needs `bun install` before those tests can run
+  locally.
+- Plans 001 and 005 remained valid after plan 004 landed and were refreshed to
+  the current commit. Plans 002, 003, 006, and 007 had no drift or uncommitted
+  overlap.
+
 ## Recommended order (rationale)
 
 1. **005** first — it is the verification gate; landing it means every plan below

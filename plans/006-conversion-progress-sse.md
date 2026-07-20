@@ -277,4 +277,3 @@ Stop and report back (do not improvise) if:
   stderr leaks into a user response.
 - If Plan 001 (batch ZIP save) lands first, note it also touches
   `use-workbench.ts` and the `Job` shape — rebase around its `outBlob` field.
-</content>

@@ -240,4 +240,3 @@ Stop and report back (do not improvise) if:
   dependency crept in.
 - If a shared `textarea` shadcn component is later added, migrate this page's raw
   `<textarea>` to it for consistency.
-</content>

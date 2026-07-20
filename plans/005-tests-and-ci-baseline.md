@@ -7,8 +7,8 @@
 > `plans/README.md`.
 >
 > **Drift check (run first)**:
-> `git diff --stat 6bfe2ba..HEAD -- src/lib/formats.ts src/lib/formats.test.ts .github/workflows package.json`
-> Then run the same command without `6bfe2ba..HEAD` to detect uncommitted
+> `git diff --stat 1cc4389..HEAD -- src/lib/formats.ts src/lib/formats.test.ts .github/workflows package.json`
+> Then run the same command without `1cc4389..HEAD` to detect uncommitted
 > overlap. If an in-scope file changed, compare the excerpts below with live
 > code; a semantic mismatch is a STOP condition.
 
@@ -19,17 +19,18 @@
 - **Risk**: LOW — adds tests and CI only; touches no runtime code paths
 - **Depends on**: none
 - **Category**: tests
-- **Planned at**: commit `6bfe2ba`, 2026-07-20
+- **Planned at**: commit `1cc4389`, refreshed 2026-07-20
 
 ## Why this matters
 
-The whole repository has exactly one test file (`src/components/speedometer.test.tsx`)
-and **no CI** (`.github/` contains only screenshots — no `workflows/`). This is
-a publicly deployed app (`recast.serhiifotex.dev`, used by people other than the
-owner per `AGENTS.md`) whose stated trajectory is to be "shared publicly as an
-open-source, self-hostable alternative" (`VISION.md:34`). Two things follow:
-every other plan in this directory (001–004, 006, 007) currently executes with
-no automated safety net, and a would-be contributor has no green check to trust.
+The committed repository has three focused test files for paste highlighting
+and search, but the conversion-format core still has no coverage and there is
+**no CI** (`.github/` has no `workflows/`). This is a publicly deployed app
+(`recast.serhiifotex.dev`, used by people other than the owner per `AGENTS.md`)
+whose stated trajectory is to be "shared publicly as an open-source,
+self-hostable alternative" (`VISION.md:34`). The paste tests do not protect the
+conversion matrix used by plans 001, 002, and 006, and a contributor still has
+no green repository check to trust.
 
 This plan installs the missing gate cheaply. `src/lib/formats.ts` is the pure,
 deterministic core of the conversion product (which target formats are offered
@@ -73,17 +74,16 @@ every push and PR.
     set (`wav`, `flac`) (`formats.ts:159-169`).
   - `formatBytes(n)` — `1023`→`"1023 B"`, `1024`→`"1.0 KB"`, rounds ≥100
     (`formats.ts:225-235`).
-- Test style to match — `src/components/speedometer.test.tsx`:
+- Pure-test style to match — `src/lib/paste-search.test.ts`:
 
-```tsx
-// src/components/speedometer.test.tsx:1-9
-// @vitest-environment jsdom
-import { cleanup, render } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+```ts
+import { describe, expect, it } from "vitest";
+import { parsePasteSearch } from "./paste-search";
 ```
 
-  `formats.ts` is pure logic, so its test needs **no** `jsdom` pragma — import
-  `{ describe, expect, it }` from `vitest` and the functions from `@/lib/formats`.
+  `formats.ts` is also pure logic, so its test needs **no** `jsdom` pragma —
+  import `{ describe, expect, it }` from `vitest` and the functions from
+  `@/lib/formats`.
 - Import alias: `@/*` maps to `./src/*` (`tsconfig.json:7-10`).
 
 ## Commands you will need
@@ -202,13 +202,12 @@ Confirm nothing regressed and only in-scope files changed.
 ## Test plan
 
 - New file: `src/lib/formats.test.ts`, structured with Vitest
-  `describe`/`it`/`expect` (model after `src/components/speedometer.test.tsx`,
-  minus the jsdom pragma since this is pure logic).
+  `describe`/`it`/`expect` (model after `src/lib/paste-search.test.ts`).
 - Cases: the enumerated matrix in Step 1 — normalization/aliases/multi-ext,
   target lists per category incl. the `gif` and archive special cases, defaults,
   quality-knob rules, byte formatting boundaries.
 - Verification: `bun run test` → all pass, including the new `formats` suite
-  alongside the existing `Speedometer` suite.
+  alongside the existing paste suites.
 
 ## Done criteria
 
@@ -251,5 +250,3 @@ Stop and report back (do not improvise) if:
   bypassed.
 - If `formats.ts` gains formats or changes `targetsFor` logic, the matrix tests
   here must be updated in the same PR.
-</content>
-</invoke>
