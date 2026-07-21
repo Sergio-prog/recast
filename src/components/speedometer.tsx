@@ -1,5 +1,7 @@
 const START_ANGLE = 150;
 const SWEEP = 240;
+const MAXIMUM_MBPS = 10_000;
+const PATH_LENGTH = 100;
 
 function point(angle: number, radius: number) {
 	const radians = (angle * Math.PI) / 180;
@@ -22,12 +24,8 @@ function valueAngle(value: number, maximum: number) {
 	);
 }
 
-function scaleFor(value: number) {
-	if (value <= 100) return 100;
-	if (value <= 500) return 500;
-	if (value <= 1_000) return 1_000;
-	if (value <= 5_000) return 5_000;
-	return 10_000;
+function formatTick(value: number) {
+	return value >= 1_000 ? `${value / 1_000}k` : value;
 }
 
 type SpeedometerProps = {
@@ -37,17 +35,10 @@ type SpeedometerProps = {
 };
 
 export function Speedometer({ value, label, active }: SpeedometerProps) {
-	const maximum = scaleFor(value);
-	const angle = valueAngle(value, maximum);
-	const needle = point(angle, 91);
-	const ticks = [
-		0,
-		maximum / 100,
-		maximum / 20,
-		maximum / 10,
-		maximum / 2,
-		maximum,
-	];
+	const angle = valueAngle(value, MAXIMUM_MBPS);
+	const progress = ((angle - START_ANGLE) / SWEEP) * PATH_LENGTH;
+	const needle = point(START_ANGLE, 91);
+	const ticks = [0, 1, 10, 100, 1_000, MAXIMUM_MBPS];
 
 	return (
 		<div
@@ -70,15 +61,20 @@ export function Speedometer({ value, label, active }: SpeedometerProps) {
 					strokeLinecap="round"
 				/>
 				<path
-					d={arc(START_ANGLE, angle, 112)}
+					d={arc(START_ANGLE, START_ANGLE + SWEEP, 112)}
 					fill="none"
 					stroke="currentColor"
 					strokeWidth="12"
-					className="text-foreground transition-all duration-100 ease-linear motion-reduce:transition-none"
+					pathLength={PATH_LENGTH}
+					strokeDasharray={PATH_LENGTH}
+					strokeDashoffset={PATH_LENGTH - progress}
+					className="text-foreground transition-[stroke-dashoffset,opacity] duration-300 ease-out motion-reduce:transition-none"
 					strokeLinecap="round"
+					opacity={value > 0 ? 1 : 0}
+					data-testid="speedometer-progress"
 				/>
 				{ticks.map((tick) => {
-					const tickAngle = valueAngle(tick, maximum);
+					const tickAngle = valueAngle(tick, MAXIMUM_MBPS);
 					const inner = point(tickAngle, 94);
 					const outer = point(tickAngle, 103);
 					const text = point(tickAngle, 78);
@@ -100,7 +96,7 @@ export function Speedometer({ value, label, active }: SpeedometerProps) {
 								dominantBaseline="middle"
 								className="fill-muted-foreground font-mono text-[8px]"
 							>
-								{tick}
+								{formatTick(tick)}
 							</text>
 						</g>
 					);
@@ -113,7 +109,13 @@ export function Speedometer({ value, label, active }: SpeedometerProps) {
 					stroke="currentColor"
 					strokeWidth="3"
 					strokeLinecap="round"
-					className="text-foreground transition-all duration-100 ease-linear motion-reduce:transition-none"
+					className="text-foreground transition-transform duration-300 ease-out motion-reduce:transition-none"
+					style={{
+						transform: `rotate(${angle - START_ANGLE}deg)`,
+						transformBox: "view-box",
+						transformOrigin: "160px 160px",
+					}}
+					data-testid="speedometer-needle"
 				/>
 				<circle
 					cx="160"
