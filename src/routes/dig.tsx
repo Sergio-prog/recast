@@ -92,6 +92,7 @@ function DigPage() {
 		answers[0] ??
 		result?.records[0];
 	const allEmpty =
+		// biome-ignore lint/complexity/useOptionalChain: keeps allEmpty strictly boolean
 		result !== null &&
 		result.records.every((r) => r.error === "no records") &&
 		(result.type === "NS" || result.type === "SOA") &&

@@ -117,6 +117,7 @@ function TokenizerPage() {
 				suppressHydrationWarning
 				aria-label="Text to tokenize"
 			/>
+			{/* biome-ignore lint/a11y/useSemanticElements: role="group" + aria-label is valid ARIA; <fieldset> breaks the flex row layout */}
 			<div
 				className="mt-3 flex flex-wrap gap-1.5"
 				role="group"
