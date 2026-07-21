@@ -1,4 +1,4 @@
-import { GaugeIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, GaugeIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -85,11 +85,13 @@ function SpeedPage() {
 				? (results.downMbps ?? 0)
 				: 0;
 	const gaugeLabel =
-		phase === "upload"
-			? "Upload"
-			: phase === "ping"
-				? "Measuring latency"
-				: "Download";
+		phase === "done"
+			? "Download result"
+			: phase === "upload"
+				? "Upload"
+				: phase === "ping"
+					? "Measuring latency"
+					: "Download";
 
 	return (
 		<main className="mx-auto w-full max-w-4xl px-4 pb-20 pt-14">
@@ -137,14 +139,28 @@ function SpeedPage() {
 						/>
 					</div>
 					<div className="text-center">
-						<Button size="lg" disabled={running} onClick={() => void run()}>
-							{running ? <Spinner /> : <GaugeIcon />}
-							{phase === "done"
-								? "Run again"
-								: running
-									? "Testing…"
-									: "Run test"}
-						</Button>
+						{phase === "done" ? (
+							<p
+								className="mb-4 inline-flex items-center gap-2 font-mono text-sm text-foreground"
+								aria-live="polite"
+							>
+								<CheckCircleIcon
+									className="size-5 text-green-600 dark:text-green-400"
+									weight="fill"
+								/>
+								Test complete. Results are ready.
+							</p>
+						) : null}
+						<div>
+							<Button size="lg" disabled={running} onClick={() => void run()}>
+								{running ? <Spinner /> : <GaugeIcon />}
+								{phase === "done"
+									? "Run again"
+									: running
+										? "Testing…"
+										: "Run test"}
+							</Button>
+						</div>
 					</div>
 				</div>
 			</section>
