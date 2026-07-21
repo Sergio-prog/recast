@@ -8,13 +8,10 @@ const UPDATE_INTERVAL_MS = 100;
 export type ThroughputUpdate = (mbps: number) => void;
 
 function makePayload(bytes: number): Uint8Array<ArrayBuffer> {
-	const chunk = new Uint8Array(65_536);
-	crypto.getRandomValues(chunk);
 	const payload = new Uint8Array(bytes);
-	for (let offset = 0; offset < bytes; offset += chunk.length) {
-		payload.set(
-			chunk.subarray(0, Math.min(chunk.length, bytes - offset)),
-			offset,
+	for (let offset = 0; offset < bytes; offset += 65_536) {
+		crypto.getRandomValues(
+			payload.subarray(offset, Math.min(offset + 65_536, bytes)),
 		);
 	}
 	return payload;

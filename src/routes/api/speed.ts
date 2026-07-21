@@ -1,7 +1,8 @@
 import { randomBytes } from "node:crypto";
 import { createFileRoute } from "@tanstack/react-router";
 
-const CHUNK = randomBytes(65536);
+const CHUNK_BYTES = 65_536;
+const RANDOM_POOL = randomBytes(8 * 1024 * 1024);
 const MAX_BYTES = 1024 * 1024 * 1024;
 
 export const Route = createFileRoute("/api/speed")({
@@ -29,8 +30,13 @@ export const Route = createFileRoute("/api/speed")({
 							controller.close();
 							return;
 						}
-						const take = Math.min(CHUNK.length, bytes - sent);
-						controller.enqueue(CHUNK.subarray(0, take));
+						const offset = sent % RANDOM_POOL.length;
+						const take = Math.min(
+							CHUNK_BYTES,
+							bytes - sent,
+							RANDOM_POOL.length - offset,
+						);
+						controller.enqueue(RANDOM_POOL.subarray(offset, offset + take));
 						sent += take;
 					},
 				});
@@ -38,7 +44,7 @@ export const Route = createFileRoute("/api/speed")({
 					headers: {
 						"content-type": "application/octet-stream",
 						"content-length": String(bytes),
-						"cache-control": "no-store",
+						"cache-control": "no-store, no-transform",
 						"content-encoding": "identity",
 						"x-content-type-options": "nosniff",
 					},
