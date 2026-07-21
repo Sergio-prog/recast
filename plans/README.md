@@ -9,7 +9,7 @@ its STOP conditions, and update its row when done.
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 005 | Verification baseline: format-matrix tests + GitHub Actions CI | P1 | M | — | TODO |
+| 005 | Verification baseline: format-matrix tests + GitHub Actions CI | P1 | M | — | DONE (merged, PR #1) |
 | 001 | Save converted results as one ZIP | P1 | M | — | TODO |
 | 002 | Add image resize, rotation, and metadata controls | P1 | M | — | TODO |
 | 003 | Add downloader resolution and bitrate controls | P1 | M | — | TODO |

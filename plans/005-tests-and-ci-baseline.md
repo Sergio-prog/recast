@@ -16,10 +16,17 @@
 
 - **Priority**: P1
 - **Effort**: M
-- **Risk**: LOW — adds tests and CI only; touches no runtime code paths
+- **Risk**: LOW-MED — adds tests + CI; also clears pre-existing biome debt so
+  the CI `check` step is green (small, mostly auto-fixable code touches)
 - **Depends on**: none
 - **Category**: tests
 - **Planned at**: commit `1cc4389`, refreshed 2026-07-20
+- **Refined after execution attempt (2026-07-20)**: the first executor run
+  completed the tests + workflow correctly but hit a STOP condition — the base
+  tree already fails `bun run check` (biome) on 5 out-of-scope files, so a CI
+  workflow whose first step is `bun run check` would be red on the first push.
+  Scope is now extended to fix that pre-existing debt so CI ships green. See
+  Step 2b.
 
 ## Why this matters
 
@@ -104,18 +111,30 @@ import { parsePasteSearch } from "./paste-search";
 - `src/lib/formats.test.ts` (create)
 - `.github/workflows/ci.yml` (create)
 - `plans/README.md` (status row only)
+- Biome-debt fixes ONLY (Step 2b) in these five pre-existing files — the change
+  in each is limited strictly to what `bun run check` flags, nothing else:
+  - `biome.json` — `$schema` version bump + trailing-newline format
+  - `.vscode/settings.json` — reformat (biome's tab indent)
+  - `vite.config.ts` — organize imports + format
+  - `src/routes/dig.tsx` — one optional-chain lint fix (line ~95)
+  - `src/routes/tokenizer.tsx` — one `useSemanticElements` a11y fix (line ~122)
 
 **Out of scope** (do NOT touch):
 
 - `src/lib/formats.ts` — this plan tests it, it does not change it. If a test
   reveals a genuine bug, that is a STOP-and-report condition, not a fix to make
   here.
-- Any conversion engine code (`src/server/*`), routes, or components.
+- Any conversion engine code (`src/server/*`). Do not touch routes/components
+  other than the two named above, and in those two make ONLY the specific biome
+  fix — no refactors, renames, or drive-by changes.
 - Adding tests that shell out to `ffmpeg`, `sharp`, `bsdtar`, `yt-dlp`, or
   `playwright` — engine-dependent tests are explicitly deferred (see
   Maintenance notes) so CI stays fast and hermetic.
 - Adding new npm/bun dependencies. `vitest` and `@testing-library` are already
   present.
+- Disabling any biome rule globally in `biome.json` or dropping the `check` step
+  from CI to "make it pass" — a single documented `// biome-ignore` on one line
+  is acceptable where a real fix carries visual/behavioral risk (see Step 2b).
 
 ## Git workflow
 
@@ -191,13 +210,51 @@ Notes for the executor:
 (prints the document). This checks YAML validity locally; the workflow itself
 runs on GitHub after push.
 
+### Step 2b: Clear the pre-existing biome debt so `bun run check` passes
+
+The base tree fails `bun run check` on 5 files unrelated to this plan; the CI
+`check` step (and the "`check` exits 0" done criterion) cannot pass until they
+are clean. Fix ONLY what biome flags, in this order:
+
+1. **`biome.json` `$schema` version** — the URL pins `2.2.4` but the installed
+   CLI is `2.4.5` (`@biomejs/biome` in `package.json`). Change the schema URL's
+   version segment `2.2.4` → `2.4.5`. (Do not run `biome migrate` — it may
+   rewrite unrelated config; make the one-token edit.)
+2. **Auto-fixable formatting + imports** — run `bunx biome check --write`. This
+   safely reformats `biome.json`, `.vscode/settings.json`, and `vite.config.ts`
+   and organizes `vite.config.ts` imports. It applies **safe** fixes only.
+3. **`src/routes/dig.tsx:~95` `useOptionalChain`** — biome marks this an *unsafe*
+   fix (it changes `result !== null && result.records.every(...)` to
+   `result?.records.every(...)`, whose type becomes `boolean | undefined`).
+   Apply it, then confirm `bunx tsc --noEmit` still exits 0. If tsc now errors
+   because `allEmpty` is consumed as a strict `boolean`, revert to the explicit
+   form and add a single-line `// biome-ignore lint/complexity/useOptionalChain:
+   keeps allEmpty strictly boolean` above line 95 instead.
+4. **`src/routes/tokenizer.tsx:~122` `useSemanticElements`** — biome wants the
+   `<div role="group" aria-label="Model">` changed to `<fieldset>`. A naive
+   swap risks breaking the surrounding flex layout (`<fieldset>` carries default
+   margin/padding/min-width). Preferred: only change it to `<fieldset>` if you
+   can keep the exact classes AND the layout is visually unchanged — but you
+   cannot verify visuals here, so **default to** adding a single-line
+   `// biome-ignore lint/a11y/useSemanticElements: role="group" + aria-label is
+   valid ARIA; <fieldset> breaks the flex row layout` above line 122. This is a
+   targeted, documented suppression of one stylistic rule — NOT disabling the
+   rule globally.
+
+**Verify**: `bun run check` → exit 0 (no errors, no warnings); `bunx tsc
+--noEmit` → exit 0; `bun run test` → all pass (confirms the dig.tsx change didn't
+break anything).
+
 ### Step 3: Run the full local gate set
 
 Confirm nothing regressed and only in-scope files changed.
 
 **Verify**: `bun run check && bunx tsc --noEmit && bun run test && bun run build`
-→ all exit 0; `git status --short` lists only `src/lib/formats.test.ts`,
-`.github/workflows/ci.yml`, and `plans/README.md`.
+→ all exit 0; `git status --short` lists only the in-scope files:
+`src/lib/formats.test.ts`, `.github/workflows/ci.yml`, `biome.json`,
+`.vscode/settings.json`, `vite.config.ts`, `src/routes/dig.tsx`, and
+`src/routes/tokenizer.tsx` (plus any pre-existing untracked files you did not
+create). Nothing else.
 
 ## Test plan
 
@@ -216,11 +273,14 @@ ALL must hold:
 - [ ] `src/lib/formats.test.ts` exists and covers every function listed in Step 1.
 - [ ] `.github/workflows/ci.yml` exists, uses Bun, and runs check + typecheck +
       test + build.
-- [ ] `bun run check` exits 0.
+- [ ] `bun run check` exits 0 (biome debt from Step 2b cleared).
 - [ ] `bunx tsc --noEmit` exits 0.
 - [ ] `bun run test` exits 0 with the new tests passing.
 - [ ] `bun run build` exits 0.
-- [ ] `git status --short` shows only the three in-scope files.
+- [ ] Every edit to `dig.tsx`/`tokenizer.tsx`/`vite.config.ts`/`biome.json`/
+      `.vscode/settings.json` is limited to what biome flagged — no unrelated
+      changes (reviewer will read the diff).
+- [ ] `git status --short` shows only the in-scope files.
 - [ ] `plans/README.md` status row for 005 updated.
 
 ## STOP conditions
