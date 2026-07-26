@@ -9,13 +9,13 @@ its STOP conditions, and update its row when done.
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 005 | Verification baseline: format-matrix tests + GitHub Actions CI | P1 | M | — | DONE (merged, PR #1) |
+| 005 | Verification baseline: format-matrix tests + GitHub Actions CI | P1 | M | — | DONE (merged, PR #1; verified `aef00ea`) |
 | 001 | Save converted results as one ZIP | P1 | M | — | TODO |
 | 002 | Add image resize, rotation, and metadata controls | P1 | M | — | TODO |
 | 003 | Add downloader resolution and bitrate controls | P1 | M | — | TODO |
 | 006 | Stream real conversion progress for video/audio (SSE) | P1 | L | 005 (rec.) | TODO |
-| 004 | Add paste highlighting and owner-scoped search | P2 | M | — | DONE |
-| 007 | Add one client-side developer utility (Encode & Hash spike) | P3 | S | — | TODO |
+| 004 | Add paste highlighting and owner-scoped search | P2 | M | — | DONE (verified `aef00ea`) |
+| 007 | Add one client-side developer utility (Encode & Hash spike) | P3 | S | — | DONE (branch `feat/encode-tool`) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale)
@@ -29,6 +29,29 @@ REJECTED (with one-line rationale)
 - Plans 001 and 005 remained valid after plan 004 landed and were refreshed to
   the current commit. Plans 002, 003, 006, and 007 had no drift or uncommitted
   overlap.
+- 2026-07-26 at `aef00ea`: 004 and 005 re-verified — `bun run test` is green
+  (9 files, 92 tests), `.github/workflows/ci.yml` runs check + tsc + test +
+  build. Nothing else from the backlog shipped since: the only work merged was
+  PR #2 (`feat/speed-improvements`), polish on the pre-existing `/speed` tool,
+  which touches no plan's in-scope files. Drift checks for 001, 002, 003, 006
+  and 007 are all empty (007 shows a 1-line change in `tokenizer.tsx`, its
+  read-only exemplar — no impact). All five findings still exist verbatim; no
+  plan needed refreshing and none were rejected.
+- 2026-07-26: plan 007 executed and reviewed — APPROVED. `/encode` ships
+  Base64/URL/hex transforms and SHA-1/256/384/512 hashing entirely in the
+  browser, zero new dependencies (`git diff package.json bun.lock` empty), no
+  `fetch`/server function in either new file. Gates re-run by the reviewer in
+  the executor worktree: `bunx tsc --noEmit` 0, `bun run check` clean,
+  `bun run test` 57/57 (6 files), `bun run build` 0. Six files changed, all in
+  scope. One approved deviation: a copy-to-clipboard button on the output,
+  using `navigator.clipboard` and mirroring `src/routes/paste/$id.tsx` — a Web
+  API affordance inside the one tool, not a second utility.
+- Housekeeping (not blocking): a stale worktree for the merged
+  `test/formats-and-ci` branch still sits at
+  `.claude/worktrees/agent-a70c1eed9565d9d99`. Vitest does not exclude it, so
+  `bun run test` in the main checkout picks up its copies of the suites and
+  reports 9 files / 92 tests instead of the real 5 files / 47. Remove the
+  worktree (its branch is merged) to restore an accurate count.
 
 ## Recommended order (rationale)
 
