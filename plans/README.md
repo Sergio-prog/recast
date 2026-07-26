@@ -16,6 +16,7 @@ its STOP conditions, and update its row when done.
 | 006 | Stream real conversion progress for video/audio (SSE) | P1 | L | 005 (rec.) | TODO |
 | 004 | Add paste highlighting and owner-scoped search | P2 | M | — | DONE (verified `aef00ea`) |
 | 007 | Add one client-side developer utility (Encode & Hash spike) | P3 | S | — | DONE (branch `feat/encode-tool`) |
+| 008 | Rebuild /encode around one mode selector and a swap | P2 | S | 007 | DONE (branch `feat/encode-tool`) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale)
@@ -46,7 +47,26 @@ REJECTED (with one-line rationale)
   scope. One approved deviation: a copy-to-clipboard button on the output,
   using `navigator.clipboard` and mirroring `src/routes/paste/$id.tsx` — a Web
   API affordance inside the one tool, not a second utility.
-- Housekeeping (not blocking): a stale worktree for the merged
+- 2026-07-26: plan 008 written and executed after the maintainer reviewed the
+  007 page — "Transform, Hashing, Method select and Encode/decode select is a
+  bad UX… especially these two selects in one row." Correct: the page asked
+  three questions (which card, which codec, which direction) via two visually
+  identical unlabelled `ToggleGroup`s sitting adjacent in a card header. 008
+  collapses that to one tab row (`Base64 · URL · Hex · SHA`) plus a swap button,
+  following the same resolution `50cdb23` applied to `/pdf`. Reviewed and
+  APPROVED over one revision round (three clean-code nits: a constant named for
+  its first caller, a thrice-repeated lambda, three near-identical `TabsContent`
+  blocks). Gates re-run by the reviewer after the revision: `tsc` 0, `check`
+  clean, `test` 60/60, `build` 0, scope clean, no dependency change.
+- Housekeeping: the two stale worktrees noted below were removed on 2026-07-26.
+  The underlying cause is unfixed and is a live trap — Vitest does not exclude
+  `.claude/`, so *any* agent worktree under `.claude/worktrees/` gets its test
+  files swept into a main-checkout `bun run test` run. The real suite is 5 files
+  / 47 tests (pre-008); inflated counts of 92 and 104 were both observed. A
+  `test.exclude` entry in `vite.config.ts` would fix it — currently that config
+  has no `test` block at all. Candidate for a small plan 009.
+- Superseded housekeeping note (kept for the record): a stale worktree for the
+  merged
   `test/formats-and-ci` branch still sits at
   `.claude/worktrees/agent-a70c1eed9565d9d99`. Vitest does not exclude it, so
   `bun run test` in the main checkout picks up its copies of the suites and
