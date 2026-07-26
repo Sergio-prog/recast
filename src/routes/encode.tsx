@@ -56,7 +56,9 @@ const SHA_ALGORITHMS: Array<ShaAlgorithm> = [
 	"SHA-512",
 ];
 
-const COPY_BUTTON_CLASSES =
+const CODECS: Array<Codec> = ["base64", "url", "hex"];
+
+const ICON_BUTTON_CLASSES =
 	"rounded-md border bg-card p-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50";
 
 function transform(
@@ -98,7 +100,7 @@ function CopyButton({
 	return (
 		<button
 			type="button"
-			className={cn(COPY_BUTTON_CLASSES, className)}
+			className={cn(ICON_BUTTON_CLASSES, className)}
 			disabled={value === ""}
 			onClick={() => {
 				void navigator.clipboard.writeText(value);
@@ -128,6 +130,8 @@ function EncodePage() {
 		return MODES.some((m) => m.value === saved) ? (saved as Mode) : "base64";
 	});
 	const [direction, setDirection] = useState<Direction>("encode");
+	const swapDirection = () =>
+		setDirection((d) => (d === "encode" ? "decode" : "encode"));
 	const [hashes, setHashes] = useState<Record<ShaAlgorithm, string>>(
 		() =>
 			Object.fromEntries(SHA_ALGORITHMS.map((algo) => [algo, ""])) as Record<
@@ -196,42 +200,18 @@ function EncodePage() {
 						</TabsTrigger>
 					))}
 				</TabsList>
-				<TabsContent value="base64">
-					<TransformPanel
-						codec="base64"
-						direction={direction}
-						text={text}
-						debouncedText={debouncedText}
-						onTextChange={setText}
-						onSwapDirection={() =>
-							setDirection((d) => (d === "encode" ? "decode" : "encode"))
-						}
-					/>
-				</TabsContent>
-				<TabsContent value="url">
-					<TransformPanel
-						codec="url"
-						direction={direction}
-						text={text}
-						debouncedText={debouncedText}
-						onTextChange={setText}
-						onSwapDirection={() =>
-							setDirection((d) => (d === "encode" ? "decode" : "encode"))
-						}
-					/>
-				</TabsContent>
-				<TabsContent value="hex">
-					<TransformPanel
-						codec="hex"
-						direction={direction}
-						text={text}
-						debouncedText={debouncedText}
-						onTextChange={setText}
-						onSwapDirection={() =>
-							setDirection((d) => (d === "encode" ? "decode" : "encode"))
-						}
-					/>
-				</TabsContent>
+				{CODECS.map((codec) => (
+					<TabsContent key={codec} value={codec}>
+						<TransformPanel
+							codec={codec}
+							direction={direction}
+							text={text}
+							debouncedText={debouncedText}
+							onTextChange={setText}
+							onSwapDirection={swapDirection}
+						/>
+					</TabsContent>
+				))}
 				<TabsContent value="sha">
 					<Card className="mt-2">
 						<CardContent className="flex flex-col gap-4">
@@ -311,7 +291,7 @@ function TransformPanel({
 						type="button"
 						onClick={onSwapDirection}
 						aria-label={`Swap to ${direction === "encode" ? "decode" : "encode"}`}
-						className={COPY_BUTTON_CLASSES}
+						className={ICON_BUTTON_CLASSES}
 					>
 						<ArrowsLeftRightIcon className="size-4" />
 					</button>
