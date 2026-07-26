@@ -16,6 +16,7 @@ import { Route as ScreenshotRouteImport } from './routes/screenshot'
 import { Route as PdfRouteImport } from './routes/pdf'
 import { Route as IpRouteImport } from './routes/ip'
 import { Route as ImagesRouteImport } from './routes/images'
+import { Route as EncodeRouteImport } from './routes/encode'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DigRouteImport } from './routes/dig'
 import { Route as CurrencyRouteImport } from './routes/currency'
@@ -68,6 +69,11 @@ const IpRoute = IpRouteImport.update({
 const ImagesRoute = ImagesRouteImport.update({
   id: '/images',
   path: '/images',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EncodeRoute = EncodeRouteImport.update({
+  id: '/encode',
+  path: '/encode',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/currency': typeof CurrencyRoute
   '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
+  '/encode': typeof EncodeRoute
   '/images': typeof ImagesRoute
   '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/currency': typeof CurrencyRoute
   '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
+  '/encode': typeof EncodeRoute
   '/images': typeof ImagesRoute
   '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/currency': typeof CurrencyRoute
   '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
+  '/encode': typeof EncodeRoute
   '/images': typeof ImagesRoute
   '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/currency'
     | '/dig'
     | '/download'
+    | '/encode'
     | '/images'
     | '/ip'
     | '/pdf'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/currency'
     | '/dig'
     | '/download'
+    | '/encode'
     | '/images'
     | '/ip'
     | '/pdf'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/currency'
     | '/dig'
     | '/download'
+    | '/encode'
     | '/images'
     | '/ip'
     | '/pdf'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   CurrencyRoute: typeof CurrencyRoute
   DigRoute: typeof DigRoute
   DownloadRoute: typeof DownloadRoute
+  EncodeRoute: typeof EncodeRoute
   ImagesRoute: typeof ImagesRoute
   IpRoute: typeof IpRoute
   PdfRoute: typeof PdfRoute
@@ -403,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/images'
       fullPath: '/images'
       preLoaderRoute: typeof ImagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/encode': {
+      id: '/encode'
+      path: '/encode'
+      fullPath: '/encode'
+      preLoaderRoute: typeof EncodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -552,6 +572,7 @@ const rootRouteChildren: RootRouteChildren = {
   CurrencyRoute: CurrencyRoute,
   DigRoute: DigRoute,
   DownloadRoute: DownloadRoute,
+  EncodeRoute: EncodeRoute,
   ImagesRoute: ImagesRoute,
   IpRoute: IpRoute,
   PdfRoute: PdfRoute,

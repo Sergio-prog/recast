@@ -9,6 +9,7 @@ import {
 	FilmStripIcon,
 	GaugeIcon,
 	GlobeIcon,
+	HashIcon,
 	type Icon,
 	ImageIcon,
 	ListMagnifyingGlassIcon,
@@ -93,6 +94,13 @@ const TOOLS: Array<{
 		label: "Speed test",
 		blurb: "Ping, download and upload between your browser and this server.",
 		icon: GaugeIcon,
+	},
+	{
+		to: "/encode",
+		label: "Encode & Hash",
+		blurb:
+			"Base64, URL and hex encode/decode, plus SHA hashing — all in your browser.",
+		icon: HashIcon,
 	},
 ];
 

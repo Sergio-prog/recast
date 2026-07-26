@@ -134,6 +134,7 @@ const TAIL_NAV = [
 	{ to: "/download", label: "Download" },
 	{ to: "/currency", label: "Currency" },
 	{ to: "/tokenizer", label: "Tokenizer" },
+	{ to: "/encode", label: "Encode" },
 ] as const;
 
 function NavLink({ to, label }: { to: string; label: string }) {
