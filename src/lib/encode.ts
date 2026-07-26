@@ -55,6 +55,10 @@ export function hexDecode(text: string): DecodeResult {
 	}
 }
 
+export function byteLength(text: string): number {
+	return utf8Encoder.encode(text).length;
+}
+
 export type ShaAlgorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
 export async function sha(algo: ShaAlgorithm, text: string): Promise<string> {

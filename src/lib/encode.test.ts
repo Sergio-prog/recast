@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	base64Decode,
 	base64Encode,
+	byteLength,
 	hexDecode,
 	hexEncode,
 	sha,
@@ -56,6 +57,20 @@ describe("hexEncode / hexDecode", () => {
 
 	it("returns ok:false for non-hex characters", () => {
 		expect(hexDecode("zz").ok).toBe(false);
+	});
+});
+
+describe("byteLength", () => {
+	it("returns 0 for an empty string", () => {
+		expect(byteLength("")).toBe(0);
+	});
+
+	it("returns the character count for ASCII", () => {
+		expect(byteLength("hello")).toBe(5);
+	});
+
+	it("counts UTF-8 bytes for multi-byte characters", () => {
+		expect(byteLength("café 🚀")).toBe(10);
 	});
 });
 
