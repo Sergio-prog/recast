@@ -9,13 +9,14 @@ its STOP conditions, and update its row when done.
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 005 | Verification baseline: format-matrix tests + GitHub Actions CI | P1 | M | — | DONE (merged, PR #1) |
+| 005 | Verification baseline: format-matrix tests + GitHub Actions CI | P1 | M | — | DONE (merged, PR #1; verified `aef00ea`) |
 | 001 | Save converted results as one ZIP | P1 | M | — | TODO |
 | 002 | Add image resize, rotation, and metadata controls | P1 | M | — | TODO |
 | 003 | Add downloader resolution and bitrate controls | P1 | M | — | TODO |
 | 006 | Stream real conversion progress for video/audio (SSE) | P1 | L | 005 (rec.) | TODO |
-| 004 | Add paste highlighting and owner-scoped search | P2 | M | — | DONE |
-| 007 | Add one client-side developer utility (Encode & Hash spike) | P3 | S | — | TODO |
+| 004 | Add paste highlighting and owner-scoped search | P2 | M | — | DONE (verified `aef00ea`) |
+| 007 | Add one client-side developer utility (Encode & Hash spike) | P3 | S | — | DONE (branch `feat/encode-tool`) |
+| 008 | Rebuild /encode around one mode selector and a swap | P2 | S | 007 | DONE (branch `feat/encode-tool`) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale)
@@ -29,6 +30,48 @@ REJECTED (with one-line rationale)
 - Plans 001 and 005 remained valid after plan 004 landed and were refreshed to
   the current commit. Plans 002, 003, 006, and 007 had no drift or uncommitted
   overlap.
+- 2026-07-26 at `aef00ea`: 004 and 005 re-verified — `bun run test` is green
+  (9 files, 92 tests), `.github/workflows/ci.yml` runs check + tsc + test +
+  build. Nothing else from the backlog shipped since: the only work merged was
+  PR #2 (`feat/speed-improvements`), polish on the pre-existing `/speed` tool,
+  which touches no plan's in-scope files. Drift checks for 001, 002, 003, 006
+  and 007 are all empty (007 shows a 1-line change in `tokenizer.tsx`, its
+  read-only exemplar — no impact). All five findings still exist verbatim; no
+  plan needed refreshing and none were rejected.
+- 2026-07-26: plan 007 executed and reviewed — APPROVED. `/encode` ships
+  Base64/URL/hex transforms and SHA-1/256/384/512 hashing entirely in the
+  browser, zero new dependencies (`git diff package.json bun.lock` empty), no
+  `fetch`/server function in either new file. Gates re-run by the reviewer in
+  the executor worktree: `bunx tsc --noEmit` 0, `bun run check` clean,
+  `bun run test` 57/57 (6 files), `bun run build` 0. Six files changed, all in
+  scope. One approved deviation: a copy-to-clipboard button on the output,
+  using `navigator.clipboard` and mirroring `src/routes/paste/$id.tsx` — a Web
+  API affordance inside the one tool, not a second utility.
+- 2026-07-26: plan 008 written and executed after the maintainer reviewed the
+  007 page — "Transform, Hashing, Method select and Encode/decode select is a
+  bad UX… especially these two selects in one row." Correct: the page asked
+  three questions (which card, which codec, which direction) via two visually
+  identical unlabelled `ToggleGroup`s sitting adjacent in a card header. 008
+  collapses that to one tab row (`Base64 · URL · Hex · SHA`) plus a swap button,
+  following the same resolution `50cdb23` applied to `/pdf`. Reviewed and
+  APPROVED over one revision round (three clean-code nits: a constant named for
+  its first caller, a thrice-repeated lambda, three near-identical `TabsContent`
+  blocks). Gates re-run by the reviewer after the revision: `tsc` 0, `check`
+  clean, `test` 60/60, `build` 0, scope clean, no dependency change.
+- Housekeeping: the two stale worktrees noted below were removed on 2026-07-26.
+  The underlying cause is unfixed and is a live trap — Vitest does not exclude
+  `.claude/`, so *any* agent worktree under `.claude/worktrees/` gets its test
+  files swept into a main-checkout `bun run test` run. The real suite is 5 files
+  / 47 tests (pre-008); inflated counts of 92 and 104 were both observed. A
+  `test.exclude` entry in `vite.config.ts` would fix it — currently that config
+  has no `test` block at all. Candidate for a small plan 009.
+- Superseded housekeeping note (kept for the record): a stale worktree for the
+  merged
+  `test/formats-and-ci` branch still sits at
+  `.claude/worktrees/agent-a70c1eed9565d9d99`. Vitest does not exclude it, so
+  `bun run test` in the main checkout picks up its copies of the suites and
+  reports 9 files / 92 tests instead of the real 5 files / 47. Remove the
+  worktree (its branch is merged) to restore an accurate count.
 
 ## Recommended order (rationale)
 
