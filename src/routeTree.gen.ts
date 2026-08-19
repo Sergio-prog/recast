@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ViewerRouteImport } from './routes/viewer'
 import { Route as VideoRouteImport } from './routes/video'
 import { Route as TokenizerRouteImport } from './routes/tokenizer'
 import { Route as SpeedRouteImport } from './routes/speed'
@@ -36,6 +37,11 @@ import { Route as ApiConvertRouteImport } from './routes/api/convert'
 import { Route as ApiPasteIdRouteImport } from './routes/api/paste.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
+const ViewerRoute = ViewerRouteImport.update({
+  id: '/viewer',
+  path: '/viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
   path: '/video',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/speed': typeof SpeedRoute
   '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
+  '/viewer': typeof ViewerRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/dig': typeof ApiDigRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/speed': typeof SpeedRoute
   '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
+  '/viewer': typeof ViewerRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/dig': typeof ApiDigRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/speed': typeof SpeedRoute
   '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
+  '/viewer': typeof ViewerRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/dig': typeof ApiDigRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/speed'
     | '/tokenizer'
     | '/video'
+    | '/viewer'
     | '/api/convert'
     | '/api/currency'
     | '/api/dig'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/speed'
     | '/tokenizer'
     | '/video'
+    | '/viewer'
     | '/api/convert'
     | '/api/currency'
     | '/api/dig'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/speed'
     | '/tokenizer'
     | '/video'
+    | '/viewer'
     | '/api/convert'
     | '/api/currency'
     | '/api/dig'
@@ -353,6 +365,7 @@ export interface RootRouteChildren {
   SpeedRoute: typeof SpeedRoute
   TokenizerRoute: typeof TokenizerRoute
   VideoRoute: typeof VideoRoute
+  ViewerRoute: typeof ViewerRoute
   ApiConvertRoute: typeof ApiConvertRoute
   ApiCurrencyRoute: typeof ApiCurrencyRoute
   ApiDigRoute: typeof ApiDigRoute
@@ -369,6 +382,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/viewer': {
+      id: '/viewer'
+      path: '/viewer'
+      fullPath: '/viewer'
+      preLoaderRoute: typeof ViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/video': {
       id: '/video'
       path: '/video'
@@ -580,6 +600,7 @@ const rootRouteChildren: RootRouteChildren = {
   SpeedRoute: SpeedRoute,
   TokenizerRoute: TokenizerRoute,
   VideoRoute: VideoRoute,
+  ViewerRoute: ViewerRoute,
   ApiConvertRoute: ApiConvertRoute,
   ApiCurrencyRoute: ApiCurrencyRoute,
   ApiDigRoute: ApiDigRoute,

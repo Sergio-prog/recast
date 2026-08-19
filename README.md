@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <code>convert</code> · <code>pdf</code> · <code>paste</code> · <code>screenshot</code> ·
+  <code>convert</code> · <code>pdf</code> · <code>viewer</code> · <code>paste</code> · <code>screenshot</code> ·
   <code>tokenizer</code> · <code>dig</code> · <code>ip</code> · <code>speed</code> ·
   <code>download</code> · <code>currency</code>
 </p>
@@ -47,6 +47,9 @@
   - Archives: ZIP ↔ TAR / TAR.GZ / TAR.BZ2 / TAR.XZ / 7Z
   - Compression: keep the format, lower the quality knob
 - **PDF** — merge, split by pages or ranges, images → one PDF, PDF ↔ images
+- **Viewer** — open CSV, XLSX and PDF files in the browser: sortable,
+  filterable grid with a formula bar and sheet tabs; PDF pages with thumbnails,
+  zoom, rotation and selectable text. Fully client-side
 - **Paste** — link-only or private pastes with tags, description and expiry;
   Google sign-in required to create
 - **Screenshot** — capture any URL as PNG/JPG with viewport presets, delay,

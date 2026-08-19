@@ -5,9 +5,17 @@ import { cn } from "@/lib/utils";
 export function Dropzone({
 	onFiles,
 	hint = "or click to browse — images, video, audio, GIFs, archives",
+	label = "Drop files here",
+	accept,
+	multiple = true,
+	className,
 }: {
 	onFiles: (files: Array<File>) => void;
 	hint?: string;
+	label?: string;
+	accept?: string;
+	multiple?: boolean;
+	className?: string;
 }) {
 	const [dragging, setDragging] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -30,17 +38,19 @@ export function Dropzone({
 				dragging
 					? "border-primary bg-muted"
 					: "border-border bg-card hover:border-primary/60",
+				className,
 			)}
 		>
 			<span className="flex items-center gap-2 font-mono text-sm font-semibold uppercase tracking-[0.25em]">
 				<PlusIcon weight="bold" className="size-4" />
-				Drop files here
+				{label}
 			</span>
 			<span className="text-sm text-muted-foreground">{hint}</span>
 			<input
 				ref={inputRef}
 				type="file"
-				multiple
+				accept={accept}
+				multiple={multiple}
 				className="sr-only"
 				tabIndex={-1}
 				onClick={(e) => e.stopPropagation()}
