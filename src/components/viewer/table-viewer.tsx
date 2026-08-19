@@ -5,6 +5,7 @@ import {
 	CopyIcon,
 	DownloadSimpleIcon,
 	MagnifyingGlassIcon,
+	PaletteIcon,
 	XIcon,
 } from "@phosphor-icons/react";
 import {
@@ -32,6 +33,24 @@ const MIN_COLUMN = 72;
 const MAX_COLUMN = 320;
 const CHAR_WIDTH = 7.4;
 const WIDTH_SAMPLE = 300;
+
+const RAINBOW_CELL = [
+	"bg-[rgba(255,180,84,0.09)]",
+	"bg-[rgba(94,234,195,0.08)]",
+	"bg-[rgba(125,178,255,0.09)]",
+	"bg-[rgba(255,138,184,0.08)]",
+	"bg-[rgba(196,148,255,0.09)]",
+	"bg-[rgba(214,235,118,0.08)]",
+];
+
+const RAINBOW_LETTER = [
+	"bg-[rgba(255,180,84,0.2)]",
+	"bg-[rgba(94,234,195,0.18)]",
+	"bg-[rgba(125,178,255,0.2)]",
+	"bg-[rgba(255,138,184,0.18)]",
+	"bg-[rgba(196,148,255,0.2)]",
+	"bg-[rgba(214,235,118,0.18)]",
+];
 
 const KEY_MOVES: Record<string, (pageRows: number) => [number, number]> = {
 	ArrowDown: () => [1, 0],
@@ -83,6 +102,7 @@ function SheetGrid({
 }) {
 	const { rows } = sheet;
 	const [hasHeader, setHasHeader] = useState(true);
+	const [rainbow, setRainbow] = useState(false);
 	const [sort, setSort] = useState<Sort | null>(null);
 	const [query, setQuery] = useState("");
 	const [selection, setSelection] = useState<Selection | null>(null);
@@ -259,6 +279,17 @@ function SheetGrid({
 					/>
 					Header row
 				</Toggle>
+				<Toggle
+					size="sm"
+					variant="outline"
+					pressed={rainbow}
+					onPressedChange={setRainbow}
+					aria-label="Tint each column with its own color"
+					className="text-xs"
+				>
+					<PaletteIcon className="size-3.5" aria-hidden />
+					Rainbow
+				</Toggle>
 				{sort && (
 					<Button
 						variant="ghost"
@@ -333,6 +364,7 @@ function SheetGrid({
 											}
 											className={cn(
 												"sticky top-0 z-20 border-b border-r bg-muted p-0 font-medium text-muted-foreground",
+												rainbow && RAINBOW_LETTER[column % 6],
 												selection?.column === column &&
 													"text-primary shadow-[inset_0_-2px_0_var(--primary)]",
 											)}
@@ -371,6 +403,7 @@ function SheetGrid({
 											onMouseDown={() => setSelection({ row: 0, column })}
 											className={cn(
 												"sticky z-20 truncate border-b border-r bg-card px-2 font-sans text-xs font-semibold",
+												rainbow && RAINBOW_CELL[column % 6],
 												selection?.row === 0 &&
 													selection.column === column &&
 													"shadow-[inset_0_0_0_2px_var(--primary)]",
@@ -393,6 +426,7 @@ function SheetGrid({
 									cells={rows[rowIndex]}
 									columnCount={columnCount}
 									selection={selection}
+									rainbow={rainbow}
 									onSelect={setSelection}
 								/>
 							))}
@@ -455,12 +489,14 @@ function GridRow({
 	cells,
 	columnCount,
 	selection,
+	rainbow,
 	onSelect,
 }: {
 	rowIndex: number;
 	cells: Array<string>;
 	columnCount: number;
 	selection: Selection | null;
+	rainbow: boolean;
 	onSelect: (selection: Selection) => void;
 }) {
 	const rowSelected = selection?.row === rowIndex;
@@ -484,6 +520,7 @@ function GridRow({
 						onMouseDown={() => onSelect({ row: rowIndex, column })}
 						className={cn(
 							"truncate border-b border-r px-2 text-foreground group-hover/row:bg-muted/40",
+							rainbow && RAINBOW_CELL[column % 6],
 							selected &&
 								"bg-primary/5 shadow-[inset_0_0_0_2px_var(--primary)]",
 						)}
