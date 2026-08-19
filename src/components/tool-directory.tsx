@@ -4,6 +4,7 @@ import {
 	ClipboardTextIcon,
 	CurrencyCircleDollarIcon,
 	DownloadSimpleIcon,
+	EyeIcon,
 	FileArchiveIcon,
 	FilePdfIcon,
 	FilmStripIcon,
@@ -46,6 +47,12 @@ const TOOLS: Array<{
 		label: "PDF tools",
 		blurb: "Merge, split by pages or ranges, or bundle images into one PDF.",
 		icon: FilePdfIcon,
+	},
+	{
+		to: "/viewer",
+		label: "File viewer",
+		blurb: "Open CSV, Excel and PDF files in the browser — sort, filter, zoom.",
+		icon: EyeIcon,
 	},
 	{
 		to: "/screenshot",

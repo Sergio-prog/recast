@@ -120,6 +120,7 @@ const NAV = [
 	{ to: "/video", label: "Video" },
 	{ to: "/audio", label: "Audio" },
 	{ to: "/pdf", label: "PDF" },
+	{ to: "/viewer", label: "Viewer" },
 	{ to: "/paste", label: "Paste" },
 ] as const;
 
