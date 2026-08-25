@@ -17,8 +17,9 @@ export function tooLarge(request: Request, maxBytes: number): Response | null {
 	return null;
 }
 
-const buckets = new Map<string, Array<number>>();
+const buckets = new Map<string, { windowMs: number; hits: Array<number> }>();
 const WINDOW_MS = 60_000;
+export const DAY_MS = 86_400_000;
 
 function clientKey(request: Request): string {
 	return clientIpFrom(request) ?? "anon";
@@ -28,22 +29,27 @@ export function rateLimit(
 	request: Request,
 	name: string,
 	limit: number,
+	windowMs = WINDOW_MS,
 ): Response | null {
 	const key = `${name}:${clientKey(request)}`;
 	const now = Date.now();
-	const hits = (buckets.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
+	const hits = (buckets.get(key)?.hits ?? []).filter((t) => now - t < windowMs);
 	if (hits.length >= limit) {
-		const retryAfter = Math.ceil((WINDOW_MS - (now - hits[0])) / 1000);
-		return new Response("Too many requests — try again in a minute", {
+		const retryAfter = Math.ceil((windowMs - (now - hits[0])) / 1000);
+		const message =
+			windowMs > WINDOW_MS
+				? "Daily limit reached — try again tomorrow"
+				: "Too many requests — try again in a minute";
+		return new Response(message, {
 			status: 429,
 			headers: { "retry-after": String(retryAfter) },
 		});
 	}
 	hits.push(now);
-	buckets.set(key, hits);
+	buckets.set(key, { windowMs, hits });
 	if (buckets.size > 10_000) {
 		for (const [k, v] of buckets) {
-			if (v.every((t) => now - t >= WINDOW_MS)) buckets.delete(k);
+			if (v.hits.every((t) => now - t >= v.windowMs)) buckets.delete(k);
 		}
 	}
 	return null;
