@@ -50,12 +50,13 @@
 - **Viewer** — open CSV, XLSX and PDF files in the browser: sortable,
   filterable grid with a formula bar and sheet tabs; PDF pages with thumbnails,
   zoom, rotation and selectable text. Fully client-side
-- **Demotivator** — the classic black-frame meme as a canvas editor: editable
-  text layers per frame, nested "loop" frames, PNG export. Fully client-side
+- **Demotivator** — the classic black-frame meme as a canvas editor: click a
+  caption to edit it in place, drag to resize, stack "loop" frames. Fully
+  client-side
 - **Word Art** — six retro text styles plus a burning-text generator with
-  animated GIF export. Fully client-side
-- **Remove background** — color-based cutout to transparent PNG (flood fill
-  from the edges, no AI); works best on flat backgrounds, hard rate limited
+  transparent animated GIF export. Fully client-side
+- **Remove background** — segmentation model (RMBG-1.4 via transformers.js)
+  running entirely in the browser; transparent PNG out, nothing uploaded
 - **Paste** — link-only or private pastes with tags, description and expiry;
   Google sign-in required to create
 - **Screenshot** — capture any URL as PNG/JPG with viewport presets, delay,

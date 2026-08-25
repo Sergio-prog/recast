@@ -90,7 +90,7 @@ const TOOL_GROUPS: Array<{ label: string; blurb: string; tools: Array<Tool> }> =
 					to: "/removebg",
 					label: "Remove background",
 					blurb:
-						"Color-based cutout to transparent PNG — no AI, heavily rate limited.",
+						"AI cutout to transparent PNG — runs fully in your browser.",
 					icon: SelectionBackgroundIcon,
 				},
 			],

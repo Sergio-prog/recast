@@ -13,7 +13,7 @@ Recast processes uploaded files on the operator's own server. It includes image,
 - [PDF tools](https://recast.serhiifotex.dev/pdf): Merge and split PDFs or convert between PDFs and images.
 - [Demotivator](https://recast.serhiifotex.dev/demotivator): Build classic black-frame demotivator memes with editable text layers and nested frames, rendered client-side.
 - [Word Art](https://recast.serhiifotex.dev/wordart): Generate retro Word Art text and animated burning-text GIFs in the browser.
-- [Remove background](https://recast.serhiifotex.dev/removebg): Cut flat backgrounds to transparent PNG with a color-based algorithm (rate limited).
+- [Remove background](https://recast.serhiifotex.dev/removebg): Remove image backgrounds with a segmentation model that runs entirely in the browser.
 - [Website screenshot](https://recast.serhiifotex.dev/screenshot): Capture web pages as PNG or JPEG with viewport, delay, full-page, color-scheme and scale controls.
 - [Tokenizer](https://recast.serhiifotex.dev/tokenizer): Count and inspect tokens for major language-model families in the browser.
 - [Network tools](https://recast.serhiifotex.dev/dig): DNS lookup, IP inspection and a browser-to-server speed test.
