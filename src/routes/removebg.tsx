@@ -8,8 +8,9 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Dropzone } from "@/components/dropzone";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { type ModelProgress, removeBackground } from "@/lib/removebg";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/removebg")({
@@ -24,8 +25,8 @@ function RemoveBgPage() {
 	const [file, setFile] = useState<File | null>(null);
 	const [originalUrl, setOriginalUrl] = useState<string | null>(null);
 	const [resultUrl, setResultUrl] = useState<string | null>(null);
-	const [tolerance, setTolerance] = useState(32);
 	const [busy, setBusy] = useState(false);
+	const [download, setDownload] = useState<number | null>(null);
 	const requestId = useRef(0);
 
 	useEffect(() => {
@@ -40,30 +41,38 @@ function RemoveBgPage() {
 		};
 	}, [resultUrl]);
 
-	const process = async (target: File, tol: number) => {
+	const process = async (target: File) => {
 		requestId.current += 1;
 		const id = requestId.current;
 		setBusy(true);
 		try {
-			const form = new FormData();
-			form.append("file", target);
-			form.append("tolerance", String(tol));
-			const response = await fetch("/api/removebg", {
-				method: "POST",
-				body: form,
+			const blob = await removeBackground(target, (p: ModelProgress) => {
+				if (
+					id === requestId.current &&
+					p.status === "progress" &&
+					p.file?.endsWith(".onnx")
+				) {
+					setDownload(Math.round(p.progress ?? 0));
+				}
+				if (id === requestId.current && p.status === "ready") {
+					setDownload(null);
+				}
 			});
 			if (id !== requestId.current) return;
-			if (!response.ok) {
-				toast.error(await response.text());
-				return;
-			}
-			setResultUrl(URL.createObjectURL(await response.blob()));
-		} catch {
+			setDownload(null);
+			setResultUrl(URL.createObjectURL(blob));
+		} catch (e) {
+			console.error("[removebg]", e);
 			if (id === requestId.current) {
-				toast.error("The image could not be processed — try again");
+				toast.error(
+					"The image could not be processed — try a JPG, PNG or WebP",
+				);
 			}
 		} finally {
-			if (id === requestId.current) setBusy(false);
+			if (id === requestId.current) {
+				setBusy(false);
+				setDownload(null);
+			}
 		}
 	};
 
@@ -76,7 +85,7 @@ function RemoveBgPage() {
 		setFile(image);
 		setOriginalUrl(URL.createObjectURL(image));
 		setResultUrl(null);
-		void process(image, tolerance);
+		void process(image);
 	};
 
 	const reset = () => {
@@ -85,9 +94,10 @@ function RemoveBgPage() {
 		setOriginalUrl(null);
 		setResultUrl(null);
 		setBusy(false);
+		setDownload(null);
 	};
 
-	const download = () => {
+	const saveResult = () => {
 		if (!resultUrl || !file) return;
 		const a = document.createElement("a");
 		a.href = resultUrl;
@@ -104,9 +114,9 @@ function RemoveBgPage() {
 				Cut the background, keep the subject.
 			</h1>
 			<p className="mt-4 max-w-xl text-muted-foreground">
-				A fast color-based cutout — no AI, no third parties. It works best on
-				flat, even backgrounds like product shots, logos and scans. Heavily
-				rate limited, so batch your tries.
+				A segmentation model that runs entirely in your browser — the image
+				never leaves your device, and there are no limits. The first run
+				downloads the model (~40 MB); after that it&#39;s cached.
 			</p>
 
 			{!file ? (
@@ -114,49 +124,21 @@ function RemoveBgPage() {
 					className="mt-8"
 					onFiles={loadFile}
 					label="Drop an image here"
-					hint="or click to browse — JPG, PNG or WebP up to 25 MB"
+					hint="or click to browse — JPG, PNG or WebP"
 					accept="image/*"
 					multiple={false}
 				/>
 			) : (
 				<div className="mt-8 flex flex-col gap-5">
-					<div className="flex flex-wrap items-end justify-between gap-4">
-						<div className="w-full max-w-xs">
-							<div className="flex items-baseline justify-between">
-								<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-									Tolerance
-								</span>
-								<span className="font-mono text-xs tabular-nums">
-									{tolerance}
-								</span>
-							</div>
-							<Slider
-								className="mt-1.5"
-								aria-label="Tolerance"
-								value={[tolerance]}
-								min={5}
-								max={120}
-								step={1}
-								onValueChange={(value) =>
-									setTolerance(Array.isArray(value) ? value[0] : value)
-								}
-								onValueCommitted={() => file && void process(file, tolerance)}
-							/>
-							<div className="mt-1 flex justify-between text-[9px] leading-none text-muted-foreground">
-								<span>keep more</span>
-								<span>cut more</span>
-							</div>
-						</div>
-						<div className="flex items-center gap-2">
-							<Button variant="outline" onClick={reset}>
-								<ArrowCounterClockwiseIcon />
-								New image
-							</Button>
-							<Button onClick={download} disabled={!resultUrl || busy}>
-								<DownloadSimpleIcon />
-								Download PNG
-							</Button>
-						</div>
+					<div className="flex flex-wrap items-center justify-end gap-2">
+						<Button variant="outline" onClick={reset}>
+							<ArrowCounterClockwiseIcon />
+							New image
+						</Button>
+						<Button onClick={saveResult} disabled={!resultUrl || busy}>
+							<DownloadSimpleIcon />
+							Download PNG
+						</Button>
 					</div>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<figure>
@@ -180,12 +162,26 @@ function RemoveBgPage() {
 							</figcaption>
 							<div
 								className={cn(
-									"mt-2 flex min-h-32 items-center justify-center overflow-hidden rounded-xl border",
+									"mt-2 flex min-h-40 items-center justify-center overflow-hidden rounded-xl border",
 									CHECKERBOARD,
 								)}
 							>
 								{busy ? (
-									<Spinner className="size-6 text-muted-foreground" />
+									<div className="flex w-full max-w-56 flex-col items-center gap-3 p-6">
+										<Spinner className="size-5 text-muted-foreground" />
+										{download !== null ? (
+											<>
+												<Progress value={download} />
+												<p className="text-xs text-muted-foreground">
+													Downloading model — {download}%
+												</p>
+											</>
+										) : (
+											<p className="text-xs text-muted-foreground">
+												Processing…
+											</p>
+										)}
+									</div>
 								) : resultUrl ? (
 									<img
 										src={resultUrl}
@@ -194,7 +190,7 @@ function RemoveBgPage() {
 									/>
 								) : (
 									<p className="p-6 text-sm text-muted-foreground">
-										Adjust the tolerance and run again.
+										Something went wrong — drop the image again.
 									</p>
 								)}
 							</div>

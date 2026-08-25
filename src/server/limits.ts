@@ -19,7 +19,6 @@ export function tooLarge(request: Request, maxBytes: number): Response | null {
 
 const buckets = new Map<string, { windowMs: number; hits: Array<number> }>();
 const WINDOW_MS = 60_000;
-export const DAY_MS = 86_400_000;
 
 function clientKey(request: Request): string {
 	return clientIpFrom(request) ?? "anon";

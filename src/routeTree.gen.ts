@@ -30,7 +30,6 @@ import { Route as PasteIndexRouteImport } from './routes/paste/index'
 import { Route as PasteIdRouteImport } from './routes/paste/$id'
 import { Route as ApiSpeedRouteImport } from './routes/api/speed'
 import { Route as ApiScreenshotRouteImport } from './routes/api/screenshot'
-import { Route as ApiRemovebgRouteImport } from './routes/api/removebg'
 import { Route as ApiPdfRouteImport } from './routes/api/pdf'
 import { Route as ApiPasteRouteImport } from './routes/api/paste'
 import { Route as ApiIpRouteImport } from './routes/api/ip'
@@ -146,11 +145,6 @@ const ApiScreenshotRoute = ApiScreenshotRouteImport.update({
   path: '/api/screenshot',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiRemovebgRoute = ApiRemovebgRouteImport.update({
-  id: '/api/removebg',
-  path: '/api/removebg',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPdfRoute = ApiPdfRouteImport.update({
   id: '/api/pdf',
   path: '/api/pdf',
@@ -222,7 +216,6 @@ export interface FileRoutesByFullPath {
   '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
-  '/api/removebg': typeof ApiRemovebgRoute
   '/api/screenshot': typeof ApiScreenshotRoute
   '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
@@ -255,7 +248,6 @@ export interface FileRoutesByTo {
   '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
-  '/api/removebg': typeof ApiRemovebgRoute
   '/api/screenshot': typeof ApiScreenshotRoute
   '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
@@ -289,7 +281,6 @@ export interface FileRoutesById {
   '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
-  '/api/removebg': typeof ApiRemovebgRoute
   '/api/screenshot': typeof ApiScreenshotRoute
   '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
@@ -324,7 +315,6 @@ export interface FileRouteTypes {
     | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
-    | '/api/removebg'
     | '/api/screenshot'
     | '/api/speed'
     | '/paste/$id'
@@ -357,7 +347,6 @@ export interface FileRouteTypes {
     | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
-    | '/api/removebg'
     | '/api/screenshot'
     | '/api/speed'
     | '/paste/$id'
@@ -390,7 +379,6 @@ export interface FileRouteTypes {
     | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
-    | '/api/removebg'
     | '/api/screenshot'
     | '/api/speed'
     | '/paste/$id'
@@ -424,7 +412,6 @@ export interface RootRouteChildren {
   ApiIpRoute: typeof ApiIpRoute
   ApiPasteRoute: typeof ApiPasteRouteWithChildren
   ApiPdfRoute: typeof ApiPdfRoute
-  ApiRemovebgRoute: typeof ApiRemovebgRoute
   ApiScreenshotRoute: typeof ApiScreenshotRoute
   ApiSpeedRoute: typeof ApiSpeedRoute
   PasteIdRoute: typeof PasteIdRoute
@@ -581,13 +568,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiScreenshotRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/removebg': {
-      id: '/api/removebg'
-      path: '/api/removebg'
-      fullPath: '/api/removebg'
-      preLoaderRoute: typeof ApiRemovebgRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/pdf': {
       id: '/api/pdf'
       path: '/api/pdf'
@@ -691,7 +671,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIpRoute: ApiIpRoute,
   ApiPasteRoute: ApiPasteRouteWithChildren,
   ApiPdfRoute: ApiPdfRoute,
-  ApiRemovebgRoute: ApiRemovebgRoute,
   ApiScreenshotRoute: ApiScreenshotRoute,
   ApiSpeedRoute: ApiSpeedRoute,
   PasteIdRoute: PasteIdRoute,
