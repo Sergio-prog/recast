@@ -31,6 +31,10 @@ the main page stays — it is the product. Everything below builds around it.
 
 ## Done
 
+- Studio tools: demotivator editor (text layers + nested loops), Word Art and
+  burning-text GIF generator, color-based background remover with hard rate
+  limits
+- Grouped navigation and tool directory (Convert / Files / Studio / Web / Text)
 - DNS dig with four-resolver propagation check and RDAP registrar summary
 - IP inspector (public address, ISP, geo, reverse DNS, browser fingerprint)
 - Speed test (ping/download/upload against your own server)

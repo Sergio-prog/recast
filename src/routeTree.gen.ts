@@ -9,17 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WordartRouteImport } from './routes/wordart'
 import { Route as ViewerRouteImport } from './routes/viewer'
 import { Route as VideoRouteImport } from './routes/video'
 import { Route as TokenizerRouteImport } from './routes/tokenizer'
 import { Route as SpeedRouteImport } from './routes/speed'
 import { Route as ScreenshotRouteImport } from './routes/screenshot'
+import { Route as RemovebgRouteImport } from './routes/removebg'
 import { Route as PdfRouteImport } from './routes/pdf'
 import { Route as IpRouteImport } from './routes/ip'
 import { Route as ImagesRouteImport } from './routes/images'
 import { Route as EncodeRouteImport } from './routes/encode'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DigRouteImport } from './routes/dig'
+import { Route as DemotivatorRouteImport } from './routes/demotivator'
 import { Route as CurrencyRouteImport } from './routes/currency'
 import { Route as AudioRouteImport } from './routes/audio'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +30,7 @@ import { Route as PasteIndexRouteImport } from './routes/paste/index'
 import { Route as PasteIdRouteImport } from './routes/paste/$id'
 import { Route as ApiSpeedRouteImport } from './routes/api/speed'
 import { Route as ApiScreenshotRouteImport } from './routes/api/screenshot'
+import { Route as ApiRemovebgRouteImport } from './routes/api/removebg'
 import { Route as ApiPdfRouteImport } from './routes/api/pdf'
 import { Route as ApiPasteRouteImport } from './routes/api/paste'
 import { Route as ApiIpRouteImport } from './routes/api/ip'
@@ -37,6 +41,11 @@ import { Route as ApiConvertRouteImport } from './routes/api/convert'
 import { Route as ApiPasteIdRouteImport } from './routes/api/paste.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
+const WordartRoute = WordartRouteImport.update({
+  id: '/wordart',
+  path: '/wordart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ViewerRoute = ViewerRouteImport.update({
   id: '/viewer',
   path: '/viewer',
@@ -60,6 +69,11 @@ const SpeedRoute = SpeedRouteImport.update({
 const ScreenshotRoute = ScreenshotRouteImport.update({
   id: '/screenshot',
   path: '/screenshot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RemovebgRoute = RemovebgRouteImport.update({
+  id: '/removebg',
+  path: '/removebg',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PdfRoute = PdfRouteImport.update({
@@ -90,6 +104,11 @@ const DownloadRoute = DownloadRouteImport.update({
 const DigRoute = DigRouteImport.update({
   id: '/dig',
   path: '/dig',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemotivatorRoute = DemotivatorRouteImport.update({
+  id: '/demotivator',
+  path: '/demotivator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CurrencyRoute = CurrencyRouteImport.update({
@@ -125,6 +144,11 @@ const ApiSpeedRoute = ApiSpeedRouteImport.update({
 const ApiScreenshotRoute = ApiScreenshotRouteImport.update({
   id: '/api/screenshot',
   path: '/api/screenshot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRemovebgRoute = ApiRemovebgRouteImport.update({
+  id: '/api/removebg',
+  path: '/api/removebg',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPdfRoute = ApiPdfRouteImport.update({
@@ -177,17 +201,20 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
+  '/demotivator': typeof DemotivatorRoute
   '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
   '/encode': typeof EncodeRoute
   '/images': typeof ImagesRoute
   '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
+  '/removebg': typeof RemovebgRoute
   '/screenshot': typeof ScreenshotRoute
   '/speed': typeof SpeedRoute
   '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
   '/viewer': typeof ViewerRoute
+  '/wordart': typeof WordartRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/dig': typeof ApiDigRoute
@@ -195,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
+  '/api/removebg': typeof ApiRemovebgRoute
   '/api/screenshot': typeof ApiScreenshotRoute
   '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
@@ -206,17 +234,20 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
+  '/demotivator': typeof DemotivatorRoute
   '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
   '/encode': typeof EncodeRoute
   '/images': typeof ImagesRoute
   '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
+  '/removebg': typeof RemovebgRoute
   '/screenshot': typeof ScreenshotRoute
   '/speed': typeof SpeedRoute
   '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
   '/viewer': typeof ViewerRoute
+  '/wordart': typeof WordartRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/dig': typeof ApiDigRoute
@@ -224,6 +255,7 @@ export interface FileRoutesByTo {
   '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
+  '/api/removebg': typeof ApiRemovebgRoute
   '/api/screenshot': typeof ApiScreenshotRoute
   '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
@@ -236,17 +268,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
   '/currency': typeof CurrencyRoute
+  '/demotivator': typeof DemotivatorRoute
   '/dig': typeof DigRoute
   '/download': typeof DownloadRoute
   '/encode': typeof EncodeRoute
   '/images': typeof ImagesRoute
   '/ip': typeof IpRoute
   '/pdf': typeof PdfRoute
+  '/removebg': typeof RemovebgRoute
   '/screenshot': typeof ScreenshotRoute
   '/speed': typeof SpeedRoute
   '/tokenizer': typeof TokenizerRoute
   '/video': typeof VideoRoute
   '/viewer': typeof ViewerRoute
+  '/wordart': typeof WordartRoute
   '/api/convert': typeof ApiConvertRoute
   '/api/currency': typeof ApiCurrencyRoute
   '/api/dig': typeof ApiDigRoute
@@ -254,6 +289,7 @@ export interface FileRoutesById {
   '/api/ip': typeof ApiIpRoute
   '/api/paste': typeof ApiPasteRouteWithChildren
   '/api/pdf': typeof ApiPdfRoute
+  '/api/removebg': typeof ApiRemovebgRoute
   '/api/screenshot': typeof ApiScreenshotRoute
   '/api/speed': typeof ApiSpeedRoute
   '/paste/$id': typeof PasteIdRoute
@@ -267,17 +303,20 @@ export interface FileRouteTypes {
     | '/'
     | '/audio'
     | '/currency'
+    | '/demotivator'
     | '/dig'
     | '/download'
     | '/encode'
     | '/images'
     | '/ip'
     | '/pdf'
+    | '/removebg'
     | '/screenshot'
     | '/speed'
     | '/tokenizer'
     | '/video'
     | '/viewer'
+    | '/wordart'
     | '/api/convert'
     | '/api/currency'
     | '/api/dig'
@@ -285,6 +324,7 @@ export interface FileRouteTypes {
     | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
+    | '/api/removebg'
     | '/api/screenshot'
     | '/api/speed'
     | '/paste/$id'
@@ -296,17 +336,20 @@ export interface FileRouteTypes {
     | '/'
     | '/audio'
     | '/currency'
+    | '/demotivator'
     | '/dig'
     | '/download'
     | '/encode'
     | '/images'
     | '/ip'
     | '/pdf'
+    | '/removebg'
     | '/screenshot'
     | '/speed'
     | '/tokenizer'
     | '/video'
     | '/viewer'
+    | '/wordart'
     | '/api/convert'
     | '/api/currency'
     | '/api/dig'
@@ -314,6 +357,7 @@ export interface FileRouteTypes {
     | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
+    | '/api/removebg'
     | '/api/screenshot'
     | '/api/speed'
     | '/paste/$id'
@@ -325,17 +369,20 @@ export interface FileRouteTypes {
     | '/'
     | '/audio'
     | '/currency'
+    | '/demotivator'
     | '/dig'
     | '/download'
     | '/encode'
     | '/images'
     | '/ip'
     | '/pdf'
+    | '/removebg'
     | '/screenshot'
     | '/speed'
     | '/tokenizer'
     | '/video'
     | '/viewer'
+    | '/wordart'
     | '/api/convert'
     | '/api/currency'
     | '/api/dig'
@@ -343,6 +390,7 @@ export interface FileRouteTypes {
     | '/api/ip'
     | '/api/paste'
     | '/api/pdf'
+    | '/api/removebg'
     | '/api/screenshot'
     | '/api/speed'
     | '/paste/$id'
@@ -355,17 +403,20 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AudioRoute: typeof AudioRoute
   CurrencyRoute: typeof CurrencyRoute
+  DemotivatorRoute: typeof DemotivatorRoute
   DigRoute: typeof DigRoute
   DownloadRoute: typeof DownloadRoute
   EncodeRoute: typeof EncodeRoute
   ImagesRoute: typeof ImagesRoute
   IpRoute: typeof IpRoute
   PdfRoute: typeof PdfRoute
+  RemovebgRoute: typeof RemovebgRoute
   ScreenshotRoute: typeof ScreenshotRoute
   SpeedRoute: typeof SpeedRoute
   TokenizerRoute: typeof TokenizerRoute
   VideoRoute: typeof VideoRoute
   ViewerRoute: typeof ViewerRoute
+  WordartRoute: typeof WordartRoute
   ApiConvertRoute: typeof ApiConvertRoute
   ApiCurrencyRoute: typeof ApiCurrencyRoute
   ApiDigRoute: typeof ApiDigRoute
@@ -373,6 +424,7 @@ export interface RootRouteChildren {
   ApiIpRoute: typeof ApiIpRoute
   ApiPasteRoute: typeof ApiPasteRouteWithChildren
   ApiPdfRoute: typeof ApiPdfRoute
+  ApiRemovebgRoute: typeof ApiRemovebgRoute
   ApiScreenshotRoute: typeof ApiScreenshotRoute
   ApiSpeedRoute: typeof ApiSpeedRoute
   PasteIdRoute: typeof PasteIdRoute
@@ -382,6 +434,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wordart': {
+      id: '/wordart'
+      path: '/wordart'
+      fullPath: '/wordart'
+      preLoaderRoute: typeof WordartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/viewer': {
       id: '/viewer'
       path: '/viewer'
@@ -415,6 +474,13 @@ declare module '@tanstack/react-router' {
       path: '/screenshot'
       fullPath: '/screenshot'
       preLoaderRoute: typeof ScreenshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/removebg': {
+      id: '/removebg'
+      path: '/removebg'
+      fullPath: '/removebg'
+      preLoaderRoute: typeof RemovebgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pdf': {
@@ -457,6 +523,13 @@ declare module '@tanstack/react-router' {
       path: '/dig'
       fullPath: '/dig'
       preLoaderRoute: typeof DigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demotivator': {
+      id: '/demotivator'
+      path: '/demotivator'
+      fullPath: '/demotivator'
+      preLoaderRoute: typeof DemotivatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/currency': {
@@ -506,6 +579,13 @@ declare module '@tanstack/react-router' {
       path: '/api/screenshot'
       fullPath: '/api/screenshot'
       preLoaderRoute: typeof ApiScreenshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/removebg': {
+      id: '/api/removebg'
+      path: '/api/removebg'
+      fullPath: '/api/removebg'
+      preLoaderRoute: typeof ApiRemovebgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/pdf': {
@@ -590,17 +670,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AudioRoute: AudioRoute,
   CurrencyRoute: CurrencyRoute,
+  DemotivatorRoute: DemotivatorRoute,
   DigRoute: DigRoute,
   DownloadRoute: DownloadRoute,
   EncodeRoute: EncodeRoute,
   ImagesRoute: ImagesRoute,
   IpRoute: IpRoute,
   PdfRoute: PdfRoute,
+  RemovebgRoute: RemovebgRoute,
   ScreenshotRoute: ScreenshotRoute,
   SpeedRoute: SpeedRoute,
   TokenizerRoute: TokenizerRoute,
   VideoRoute: VideoRoute,
   ViewerRoute: ViewerRoute,
+  WordartRoute: WordartRoute,
   ApiConvertRoute: ApiConvertRoute,
   ApiCurrencyRoute: ApiCurrencyRoute,
   ApiDigRoute: ApiDigRoute,
@@ -608,6 +691,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIpRoute: ApiIpRoute,
   ApiPasteRoute: ApiPasteRouteWithChildren,
   ApiPdfRoute: ApiPdfRoute,
+  ApiRemovebgRoute: ApiRemovebgRoute,
   ApiScreenshotRoute: ApiScreenshotRoute,
   ApiSpeedRoute: ApiSpeedRoute,
   PasteIdRoute: PasteIdRoute,

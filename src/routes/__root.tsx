@@ -2,9 +2,23 @@ import {
 	ArrowRightIcon,
 	CameraIcon,
 	CaretDownIcon,
+	ClipboardTextIcon,
+	CurrencyCircleDollarIcon,
+	DownloadSimpleIcon,
+	EyeIcon,
+	FilePdfIcon,
+	FilmStripIcon,
+	FrameCornersIcon,
 	GaugeIcon,
 	GlobeIcon,
-	MagnifyingGlassIcon,
+	HashIcon,
+	type Icon,
+	ImageIcon,
+	ListMagnifyingGlassIcon,
+	MagicWandIcon,
+	SelectionBackgroundIcon,
+	TextAaIcon,
+	WaveformIcon,
 } from "@phosphor-icons/react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
@@ -114,46 +128,58 @@ function NotFoundPage() {
 	);
 }
 
-const NAV = [
-	{ to: "/", label: "Convert" },
-	{ to: "/images", label: "Images" },
-	{ to: "/video", label: "Video" },
-	{ to: "/audio", label: "Audio" },
-	{ to: "/pdf", label: "PDF" },
-	{ to: "/viewer", label: "Viewer" },
-	{ to: "/paste", label: "Paste" },
-] as const;
+type NavItem = { to: string; label: string; icon: Icon };
 
-const NETWORK = [
-	{ to: "/screenshot", label: "Screenshot", icon: CameraIcon },
-	{ to: "/dig", label: "DNS dig", icon: MagnifyingGlassIcon },
-	{ to: "/ip", label: "My IP", icon: GlobeIcon },
-	{ to: "/speed", label: "Speed test", icon: GaugeIcon },
-] as const;
+const CONVERT_ITEMS: Array<NavItem> = [
+	{ to: "/images", label: "Images", icon: ImageIcon },
+	{ to: "/video", label: "Video", icon: FilmStripIcon },
+	{ to: "/audio", label: "Audio", icon: WaveformIcon },
+	{ to: "/currency", label: "Currency", icon: CurrencyCircleDollarIcon },
+];
 
-const TAIL_NAV = [
-	{ to: "/download", label: "Download" },
-	{ to: "/currency", label: "Currency" },
-	{ to: "/tokenizer", label: "Tokenizer" },
-	{ to: "/encode", label: "Encode" },
-] as const;
+const NAV_GROUPS: Array<{ label: string; items: Array<NavItem> }> = [
+	{
+		label: "Files",
+		items: [
+			{ to: "/pdf", label: "PDF tools", icon: FilePdfIcon },
+			{ to: "/viewer", label: "File viewer", icon: EyeIcon },
+		],
+	},
+	{
+		label: "Studio",
+		items: [
+			{ to: "/demotivator", label: "Demotivator", icon: FrameCornersIcon },
+			{ to: "/wordart", label: "Word Art", icon: MagicWandIcon },
+			{
+				to: "/removebg",
+				label: "Remove background",
+				icon: SelectionBackgroundIcon,
+			},
+		],
+	},
+	{
+		label: "Web",
+		items: [
+			{ to: "/screenshot", label: "Screenshot", icon: CameraIcon },
+			{ to: "/download", label: "Downloader", icon: DownloadSimpleIcon },
+			{ to: "/dig", label: "DNS dig", icon: ListMagnifyingGlassIcon },
+			{ to: "/ip", label: "My IP", icon: GlobeIcon },
+			{ to: "/speed", label: "Speed test", icon: GaugeIcon },
+		],
+	},
+	{
+		label: "Text",
+		items: [
+			{ to: "/paste", label: "Pastebin", icon: ClipboardTextIcon },
+			{ to: "/tokenizer", label: "Tokenizer", icon: TextAaIcon },
+			{ to: "/encode", label: "Encode & Hash", icon: HashIcon },
+		],
+	},
+];
 
-function NavLink({ to, label }: { to: string; label: string }) {
-	return (
-		<Link
-			to={to}
-			activeOptions={{ exact: to === "/" }}
-			className="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-			activeProps={{ className: "bg-muted text-foreground" }}
-		>
-			{label}
-		</Link>
-	);
-}
-
-function NetworkMenu() {
+function NavMenu({ label, items }: { label: string; items: Array<NavItem> }) {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const active = NETWORK.some((item) => pathname.startsWith(item.to));
+	const active = items.some((item) => pathname.startsWith(item.to));
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger
@@ -162,11 +188,11 @@ function NetworkMenu() {
 					active && "bg-muted text-foreground",
 				)}
 			>
-				Network
+				{label}
 				<CaretDownIcon className="size-3.5" />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
-				{NETWORK.map((item) => (
+				{items.map((item) => (
 					<DropdownMenuItem
 						key={item.to}
 						render={
@@ -179,6 +205,48 @@ function NetworkMenu() {
 				))}
 			</DropdownMenuContent>
 		</DropdownMenu>
+	);
+}
+
+function ConvertMenu() {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const active =
+		pathname === "/" || CONVERT_ITEMS.some((item) => pathname.startsWith(item.to));
+	return (
+		<div
+			className={cn(
+				"flex items-center rounded-md text-muted-foreground",
+				active && "bg-muted text-foreground",
+			)}
+		>
+			<Link
+				to="/"
+				className="rounded-l-md py-1.5 pl-2.5 pr-1 text-sm transition-colors hover:text-foreground"
+			>
+				Convert
+			</Link>
+			<DropdownMenu>
+				<DropdownMenuTrigger
+					aria-label="Converter pages"
+					className="rounded-r-md py-2 pl-0.5 pr-1.5 transition-colors hover:text-foreground"
+				>
+					<CaretDownIcon className="size-3.5" />
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="start">
+					{CONVERT_ITEMS.map((item) => (
+						<DropdownMenuItem
+							key={item.to}
+							render={
+								<Link to={item.to}>
+									<item.icon className="size-4" />
+									{item.label}
+								</Link>
+							}
+						/>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 }
 
@@ -210,12 +278,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							</Link>
 							<div className="flex min-w-0 items-center gap-1">
 								<nav className="flex items-center gap-0.5 overflow-x-auto">
-									{NAV.map((item) => (
-										<NavLink key={item.to} {...item} />
-									))}
-									<NetworkMenu />
-									{TAIL_NAV.map((item) => (
-										<NavLink key={item.to} {...item} />
+									<ConvertMenu />
+									{NAV_GROUPS.map((group) => (
+										<NavMenu key={group.label} {...group} />
 									))}
 								</nav>
 								<ThemeToggle />
