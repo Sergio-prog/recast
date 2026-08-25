@@ -208,8 +208,10 @@ function BurningPanel() {
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
-		const { mask, width, height } = textMask(debouncedText || "on fire");
-		const sim = createFireSim(mask, width, height);
+		const { mask, outline, width, height } = textMask(
+			debouncedText || "on fire",
+		);
+		const sim = createFireSim(mask, outline, width, height);
 		canvas.width = width;
 		canvas.height = height;
 		const ctx = canvas.getContext("2d");
@@ -239,8 +241,10 @@ function BurningPanel() {
 		setEncoding(true);
 		setTimeout(() => {
 			try {
-				const { mask, width, height } = textMask(debouncedText || "on fire");
-				const sim = createFireSim(mask, width, height);
+				const { mask, outline, width, height } = textMask(
+					debouncedText || "on fire",
+				);
+				const sim = createFireSim(mask, outline, width, height);
 				const bytes = encodeFireGif(sim, cooling);
 				downloadBlob(
 					new Blob([bytes as BlobPart], { type: "image/gif" }),
@@ -291,7 +295,9 @@ function BurningPanel() {
 						/>
 					</div>
 				</div>
-				<div className="overflow-hidden rounded-xl border bg-black">
+				<div
+					className={cn("overflow-hidden rounded-xl border p-4", CHECKERBOARD)}
+				>
 					<canvas
 						ref={canvasRef}
 						className="mx-auto block h-auto max-h-80 w-auto max-w-full"
