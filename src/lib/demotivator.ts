@@ -59,8 +59,22 @@ export type RenderResult = {
 
 export type RenderOptions = {
 	placeholders?: boolean;
+	editorChrome?: boolean;
 	hideLine?: { frameId: string; line: LineKind } | null;
+	aspect?: number | null;
 };
+
+export const ASPECT_PRESETS: Array<{
+	id: string;
+	label: string;
+	value: number | null;
+}> = [
+	{ id: "auto", label: "Auto", value: null },
+	{ id: "3-4", label: "3:4", value: 3 / 4 },
+	{ id: "4-5", label: "4:5", value: 4 / 5 },
+	{ id: "1-1", label: "1:1", value: 1 },
+	{ id: "16-9", label: "16:9", value: 16 / 9 },
+];
 
 export const MIN_TEXT_SCALE = 0.02;
 export const MAX_TEXT_SCALE = 0.2;
@@ -215,6 +229,19 @@ function paintFrame(
 			height: line.boxHeight,
 			fontPx: line.fontPx,
 		});
+		if (options.editorChrome) {
+			ctx.save();
+			ctx.setLineDash([7, 6]);
+			ctx.strokeStyle = "rgba(255,255,255,0.22)";
+			ctx.lineWidth = 2;
+			ctx.strokeRect(
+				line.boxX + 0.5,
+				line.top - 5.5,
+				line.boxWidth - 1,
+				line.boxHeight + 11,
+			);
+			ctx.restore();
+		}
 		const hidden =
 			options.hideLine?.frameId === frame.id &&
 			options.hideLine?.line === line.kind;
@@ -264,5 +291,41 @@ export function renderDemotivator(
 		flat.getContext("2d")?.drawImage(image, 0, 0, width, height);
 		return { canvas: flat, hits: [] };
 	}
-	return { canvas: canvas as HTMLCanvasElement, hits };
+	let result = canvas as HTMLCanvasElement;
+	if (options.aspect) {
+		const padded = padToAspect(result, options.aspect);
+		for (const hit of hits) {
+			hit.x += padded.dx;
+			hit.top += padded.dy;
+		}
+		result = padded.canvas;
+	}
+	return { canvas: result, hits };
+}
+
+function padToAspect(
+	source: HTMLCanvasElement,
+	aspect: number,
+): { canvas: HTMLCanvasElement; dx: number; dy: number } {
+	let width = source.width;
+	let height = source.height;
+	if (width / height < aspect) {
+		width = Math.round(height * aspect);
+	} else {
+		height = Math.round(width / aspect);
+	}
+	if (width === source.width && height === source.height) {
+		return { canvas: source, dx: 0, dy: 0 };
+	}
+	const canvas = document.createElement("canvas");
+	canvas.width = width;
+	canvas.height = height;
+	const ctx = canvas.getContext("2d");
+	if (!ctx) throw new Error("Canvas is not available");
+	ctx.fillStyle = "#000000";
+	ctx.fillRect(0, 0, width, height);
+	const dx = Math.round((width - source.width) / 2);
+	const dy = Math.round((height - source.height) / 2);
+	ctx.drawImage(source, dx, dy);
+	return { canvas, dx, dy };
 }

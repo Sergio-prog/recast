@@ -3,15 +3,17 @@ import {
 	CheckIcon,
 	CopyIcon,
 	DownloadSimpleIcon,
+	PlusIcon,
 	StackMinusIcon,
 	StackPlusIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Dropzone } from "@/components/dropzone";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
+	ASPECT_PRESETS,
 	CAPTION_SCALE,
 	DEMOTIVATOR_FONT,
 	type DemotivatorFrame,
@@ -22,6 +24,7 @@ import {
 	SUBCAPTION_SCALE,
 	type TextHit,
 } from "@/lib/demotivator";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/demotivator")({
 	head: () => ({ meta: [{ title: "Demotivator — Recast" }] }),
@@ -58,6 +61,8 @@ function DemotivatorPage() {
 	const [image, setImage] = useState<LoadedImage | null>(null);
 	const [frames, setFrames] = useState<Array<DemotivatorFrame>>(initialFrames);
 	const [selected, setSelected] = useState<Selection | null>(null);
+	const [aspectId, setAspectId] = useState("auto");
+	const [exportSize, setExportSize] = useState<[number, number] | null>(null);
 	const [copied, setCopied] = useState(false);
 	const [displayScale, setDisplayScale] = useState(1);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -69,6 +74,8 @@ function DemotivatorPage() {
 		boxHeight: number;
 	} | null>(null);
 
+	const aspect =
+		ASPECT_PRESETS.find((preset) => preset.id === aspectId)?.value ?? null;
 	const selectedFrame = selected
 		? frames.find((frame) => frame.id === selected.frameId)
 		: null;
@@ -101,16 +108,20 @@ function DemotivatorPage() {
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas || !image) return;
-		const result = renderDemotivator(image.el, frames, {
+		const preview = renderDemotivator(image.el, frames, {
 			placeholders: true,
+			editorChrome: true,
 			hideLine: selected,
+			aspect,
 		});
-		hitsRef.current = result.hits;
-		canvas.width = result.canvas.width;
-		canvas.height = result.canvas.height;
-		canvas.getContext("2d")?.drawImage(result.canvas, 0, 0);
+		hitsRef.current = preview.hits;
+		canvas.width = preview.canvas.width;
+		canvas.height = preview.canvas.height;
+		canvas.getContext("2d")?.drawImage(preview.canvas, 0, 0);
 		setDisplayScale(canvas.clientWidth / canvas.width || 1);
-	}, [image, frames, selected]);
+		const output = renderDemotivator(image.el, frames, { aspect });
+		setExportSize([output.canvas.width, output.canvas.height]);
+	}, [image, frames, selected, aspect]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -189,7 +200,7 @@ function DemotivatorPage() {
 
 	const exportCanvas = () => {
 		if (!image) return null;
-		return renderDemotivator(image.el, frames, { placeholders: false }).canvas;
+		return renderDemotivator(image.el, frames, { aspect }).canvas;
 	};
 
 	const download = () => {
@@ -218,161 +229,258 @@ function DemotivatorPage() {
 		}, "image/png");
 	};
 
-	return (
-		<main className="mx-auto w-full max-w-5xl px-4 pb-20 pt-14">
-			<p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-				Studio · Demotivator
-			</p>
-			<h1 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-				Black frame. White serif. Zero motivation.
-			</h1>
-			<p className="mt-4 max-w-xl text-muted-foreground">
-				Drop an image, then click a caption on the canvas to edit it — drag the
-				corner handle to resize. Every loop wraps the whole demotivator in
-				another one. Rendered in your browser — nothing is uploaded.
-			</p>
+	if (!image) {
+		return (
+			<main className="mx-auto w-full max-w-5xl px-4 pb-20 pt-14">
+				<p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
+					Studio · Demotivator
+				</p>
+				<h1 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+					Demotivator maker
+				</h1>
+				<p className="mt-4 max-w-xl text-muted-foreground">
+					Drop an image, click the captions on the canvas to edit them, stack
+					loops, export a PNG. Rendered in your browser — nothing is uploaded.
+				</p>
+				<DemotivatorDropzone onFiles={loadFile} />
+			</main>
+		);
+	}
 
-			{!image ? (
-				<Dropzone
-					className="mt-8"
-					onFiles={loadFile}
-					label="Drop an image here"
-					hint="or click to browse — JPG, PNG, WebP or GIF"
-					accept="image/*"
-					multiple={false}
-				/>
-			) : (
-				<div className="mt-8">
-					<div className="flex flex-wrap items-center justify-between gap-3">
-						<p className="truncate font-mono text-xs uppercase tracking-widest text-muted-foreground">
-							{image.name}
-						</p>
-						<div className="flex items-center gap-1.5">
-							<Button variant="outline" size="sm" onClick={addLoop}>
-								<StackPlusIcon />
-								Add loop
-							</Button>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={removeLoop}
-								disabled={frames.length <= 1}
-							>
-								<StackMinusIcon />
-								Remove loop
-							</Button>
-							<button
-								type="button"
-								onClick={copy}
-								aria-label="Copy image"
-								className={ICON_BUTTON_CLASSES}
-							>
-								{copied ? (
-									<CheckIcon className="size-4" />
-								) : (
-									<CopyIcon className="size-4" />
-								)}
-							</button>
-							<button
-								type="button"
-								onClick={() => {
-									setImage(null);
-									setSelected(null);
-									setFrames(initialFrames());
-								}}
-								aria-label="Start over"
-								className={ICON_BUTTON_CLASSES}
-							>
-								<ArrowCounterClockwiseIcon className="size-4" />
-							</button>
-							<Button size="sm" onClick={download}>
-								<DownloadSimpleIcon />
-								PNG
-							</Button>
-						</div>
-					</div>
-					<div className="mt-3 rounded-xl border bg-black/95 p-3 sm:p-6">
-						<div className="relative mx-auto w-fit max-w-full">
-							<canvas
-								ref={canvasRef}
-								onClick={handleCanvasClick}
-								className="block h-auto max-h-[80svh] w-auto max-w-full cursor-text"
-								aria-label="Demotivator canvas — click a caption to edit it"
-							/>
-							{selected && selectedFrame && selectedHit && (
-								<div
-									className="absolute"
-									style={{
-										left: selectedHit.x * displayScale,
-										top: selectedHit.top * displayScale,
-										width: selectedHit.width * displayScale,
-										height: selectedHit.height * displayScale,
-									}}
-								>
-									<input
-										ref={inputRef}
-										value={selectedFrame[selected.line].text}
-										onChange={(e) =>
-											updateLine(selected, { text: e.target.value })
-										}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === "Escape") {
-												setSelected(null);
-											}
-										}}
-										onBlur={(e) => {
-											if (
-												!e.relatedTarget ||
-												!(e.currentTarget.parentElement?.contains(
-													e.relatedTarget,
-												) ?? false)
-											) {
-												setSelected(null);
-											}
-										}}
-										placeholder={
-											selected.line === "caption" ? "Caption" : "smaller line"
-										}
-										aria-label="Edit caption"
-										spellCheck={false}
-										className="size-full border border-dashed border-white/60 bg-transparent text-center text-white caret-white outline-none placeholder:text-white/30"
-										style={{
-											fontFamily: DEMOTIVATOR_FONT,
-											fontSize: selectedHit.fontPx * displayScale,
-										}}
-									/>
-									<button
-										type="button"
-										aria-label="Drag to resize text"
-										onPointerDown={(e) => {
-											e.preventDefault();
-											e.currentTarget.setPointerCapture(e.pointerId);
-											resizeStart.current = {
-												clientY: e.clientY,
-												scale: selectedFrame[selected.line].scale,
-												boxHeight: selectedHit.height * displayScale,
-											};
-										}}
-										onPointerMove={(e) => {
-											if (resizeStart.current) handleResizeDrag(e);
-										}}
-										onPointerUp={(e) => {
-											e.currentTarget.releasePointerCapture(e.pointerId);
-											resizeStart.current = null;
-											inputRef.current?.focus();
-										}}
-										className="absolute -bottom-1.5 -right-1.5 size-3 cursor-ns-resize rounded-[2px] border border-black bg-white"
-									/>
-								</div>
-							)}
-						</div>
-					</div>
-					<p className="mt-2 text-xs text-muted-foreground">
-						Click a caption to edit it in place. Drag the white corner handle
-						to change its size. Empty captions are skipped in the export.
-					</p>
+	return (
+		<main className="mx-auto w-full max-w-6xl px-4 pb-6 pt-5">
+			<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+				<div className="flex items-baseline gap-3">
+					<h1 className="font-display text-xl font-semibold tracking-tight">
+						Demotivator maker
+					</h1>
+					<span className="hidden truncate font-mono text-xs uppercase tracking-widest text-muted-foreground sm:inline">
+						{image.name}
+					</span>
 				</div>
-			)}
+				{exportSize && (
+					<span className="font-mono text-xs tabular-nums text-muted-foreground">
+						saves as {exportSize[0]} × {exportSize[1]} px
+					</span>
+				)}
+			</div>
+			<div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+				<div className="flex items-center gap-2">
+					<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+						Ratio
+					</span>
+					<ToggleGroup
+						variant="outline"
+						spacing={0}
+						value={[aspectId]}
+						onValueChange={(value) => {
+							if (Array.isArray(value) && value.length > 0) {
+								setAspectId(String(value[0]));
+							}
+						}}
+					>
+						{ASPECT_PRESETS.map((preset) => (
+							<ToggleGroupItem
+								key={preset.id}
+								value={preset.id}
+								aria-label={`Aspect ratio ${preset.label}`}
+								className="px-2.5 font-mono text-xs"
+							>
+								{preset.label}
+							</ToggleGroupItem>
+						))}
+					</ToggleGroup>
+				</div>
+				<div className="flex items-center gap-1.5">
+					<Button variant="outline" size="sm" onClick={addLoop}>
+						<StackPlusIcon />
+						Add loop
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={removeLoop}
+						disabled={frames.length <= 1}
+					>
+						<StackMinusIcon />
+						Remove loop
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => {
+							setImage(null);
+							setSelected(null);
+							setAspectId("auto");
+							setFrames(initialFrames());
+						}}
+					>
+						<ArrowCounterClockwiseIcon />
+						Start over
+					</Button>
+					<button
+						type="button"
+						onClick={copy}
+						aria-label="Copy image"
+						className={ICON_BUTTON_CLASSES}
+					>
+						{copied ? (
+							<CheckIcon className="size-4" />
+						) : (
+							<CopyIcon className="size-4" />
+						)}
+					</button>
+					<Button size="sm" onClick={download}>
+						<DownloadSimpleIcon />
+						PNG
+					</Button>
+				</div>
+			</div>
+			<div className="mt-3 rounded-xl border bg-black/95 p-3">
+				<div className="relative mx-auto w-fit max-w-full">
+					<canvas
+						ref={canvasRef}
+						onClick={handleCanvasClick}
+						className="block h-auto max-h-[calc(100svh-16rem)] w-auto max-w-full cursor-text"
+						aria-label="Demotivator canvas — click a caption to edit it"
+					/>
+					{selected && selectedFrame && selectedHit && (
+						<div
+							className="absolute"
+							style={{
+								left: selectedHit.x * displayScale,
+								top: selectedHit.top * displayScale,
+								width: selectedHit.width * displayScale,
+								height: selectedHit.height * displayScale,
+							}}
+						>
+							<input
+								ref={inputRef}
+								value={selectedFrame[selected.line].text}
+								onChange={(e) => updateLine(selected, { text: e.target.value })}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === "Escape") {
+										setSelected(null);
+									}
+								}}
+								onBlur={(e) => {
+									if (
+										!e.relatedTarget ||
+										!(e.currentTarget.parentElement?.contains(
+											e.relatedTarget,
+										) ?? false)
+									) {
+										setSelected(null);
+									}
+								}}
+								placeholder={
+									selected.line === "caption" ? "Caption" : "smaller line"
+								}
+								aria-label="Edit caption"
+								spellCheck={false}
+								className="size-full border border-dashed border-white/80 bg-transparent text-center text-white caret-white outline-none placeholder:text-white/30"
+								style={{
+									fontFamily: DEMOTIVATOR_FONT,
+									fontSize: selectedHit.fontPx * displayScale,
+								}}
+							/>
+							<button
+								type="button"
+								aria-label="Drag to resize text"
+								onPointerDown={(e) => {
+									e.preventDefault();
+									e.currentTarget.setPointerCapture(e.pointerId);
+									resizeStart.current = {
+										clientY: e.clientY,
+										scale: selectedFrame[selected.line].scale,
+										boxHeight: selectedHit.height * displayScale,
+									};
+								}}
+								onPointerMove={(e) => {
+									if (resizeStart.current) handleResizeDrag(e);
+								}}
+								onPointerUp={(e) => {
+									e.currentTarget.releasePointerCapture(e.pointerId);
+									resizeStart.current = null;
+									inputRef.current?.focus();
+								}}
+								className="absolute -bottom-1.5 -right-1.5 size-3 cursor-ns-resize rounded-[2px] border border-black bg-white"
+							/>
+						</div>
+					)}
+				</div>
+			</div>
+			<p className="mt-2 text-xs text-muted-foreground">
+				The dashed boxes are editable — click one to type, drag the white
+				corner handle to resize. Empty captions are skipped in the export.
+			</p>
 		</main>
+	);
+}
+
+function DemotivatorDropzone({
+	onFiles,
+}: {
+	onFiles: (files: Array<File>) => void;
+}) {
+	const [dragging, setDragging] = useState(false);
+	const inputRef = useRef<HTMLInputElement>(null);
+	return (
+		<button
+			type="button"
+			onClick={() => inputRef.current?.click()}
+			onDragOver={(e) => {
+				e.preventDefault();
+				setDragging(true);
+			}}
+			onDragLeave={() => setDragging(false)}
+			onDrop={(e) => {
+				e.preventDefault();
+				setDragging(false);
+				onFiles(Array.from(e.dataTransfer.files));
+			}}
+			className={cn(
+				"mt-8 block w-full cursor-pointer rounded-xl bg-black p-6 text-white transition-shadow sm:p-10",
+				dragging
+					? "ring-[3px] ring-ring/60"
+					: "hover:ring-[3px] hover:ring-ring/30",
+			)}
+		>
+			<span
+				className={cn(
+					"flex flex-col items-center gap-2 border-2 px-6 py-14 transition-colors",
+					dragging ? "border-white" : "border-white/80",
+				)}
+			>
+				<PlusIcon weight="bold" className="size-6" />
+				<span className="font-mono text-sm font-semibold uppercase tracking-[0.25em]">
+					Drop an image here
+				</span>
+			</span>
+			<span
+				className="mt-6 block text-center text-3xl"
+				style={{ fontFamily: DEMOTIVATOR_FONT }}
+			>
+				YOUR PICTURE
+			</span>
+			<span
+				className="mt-2 block text-center text-sm text-white/70"
+				style={{ fontFamily: DEMOTIVATOR_FONT }}
+			>
+				or click to browse — JPG, PNG, WebP or GIF
+			</span>
+			<input
+				ref={inputRef}
+				type="file"
+				accept="image/*"
+				className="sr-only"
+				tabIndex={-1}
+				onClick={(e) => e.stopPropagation()}
+				onChange={(e) => {
+					onFiles(Array.from(e.currentTarget.files ?? []));
+					e.currentTarget.value = "";
+				}}
+			/>
+		</button>
 	);
 }
