@@ -168,11 +168,15 @@ export function textMask(
 export function encodeFireGif(
 	sim: FireSim,
 	cooling: number,
+	background: [number, number, number] | null = null,
 	frames = 40,
 	delay = 60,
 ): Uint8Array {
 	const gif = GIFEncoder();
 	const index = new Uint8Array(sim.width * sim.height);
+	const palette = background
+		? [background, ...FIRE_PALETTE.slice(1)]
+		: FIRE_PALETTE;
 	for (let i = 0; i < 20; i++) stepFire(sim, cooling);
 	for (let frame = 0; frame < frames; frame++) {
 		stepFire(sim, cooling);
@@ -181,13 +185,19 @@ export function encodeFireGif(
 			index[i] = sim.heat[i] < VISIBLE_HEAT ? 0 : sim.heat[i];
 		}
 		gif.writeFrame(index, sim.width, sim.height, {
-			palette: FIRE_PALETTE,
+			palette,
 			delay,
-			transparent: true,
-			transparentIndex: 0,
+			...(background ? {} : { transparent: true, transparentIndex: 0 }),
 			dispose: 2,
 		});
 	}
 	gif.finish();
 	return gif.bytes();
+}
+
+export function hexToRgb(hex: string): [number, number, number] | null {
+	const match = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+	if (!match) return null;
+	const value = Number.parseInt(match[1], 16);
+	return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
 }

@@ -7,6 +7,11 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+	BackgroundPicker,
+	CHECKERBOARD,
+	withBackground,
+} from "@/components/background-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +22,7 @@ import { useDebounced } from "@/hooks/use-debounced";
 import {
 	createFireSim,
 	encodeFireGif,
+	hexToRgb,
 	paintFire,
 	stepFire,
 	textMask,
@@ -28,9 +34,6 @@ export const Route = createFileRoute("/wordart")({
 	head: () => ({ meta: [{ title: "Word Art — Recast" }] }),
 	component: WordArtPage,
 });
-
-const CHECKERBOARD =
-	"bg-[linear-gradient(45deg,var(--color-muted)_25%,transparent_25%,transparent_75%,var(--color-muted)_75%),linear-gradient(45deg,var(--color-muted)_25%,transparent_25%,transparent_75%,var(--color-muted)_75%)] bg-[size:16px_16px] bg-[position:0_0,8px_8px]";
 
 function downloadBlob(blob: Blob, filename: string) {
 	const a = document.createElement("a");
@@ -47,11 +50,11 @@ function WordArtPage() {
 				Studio · Word Art
 			</p>
 			<h1 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-				Type it like it&#39;s 1997.
+				Word Art &amp; burning text
 			</h1>
 			<p className="mt-4 max-w-xl text-muted-foreground">
-				Classic Word Art styles and a burning-text generator. Rendered in your
-				browser — export as transparent PNG or animated GIF.
+				Pick a style, type the text, save it as a PNG or an animated GIF — with
+				a transparent or colored background. Rendered in your browser.
 			</p>
 			<Tabs defaultValue="wordart" className="mt-8">
 				<TabsList className="w-full sm:w-fit">
@@ -112,6 +115,7 @@ function StyleSwatch({
 function WordArtPanel() {
 	const [text, setText] = useState("Your Text Here");
 	const [styleId, setStyleId] = useState(WORDART_STYLES[0].id);
+	const [background, setBackground] = useState<string | null>("#ffffff");
 	const [copied, setCopied] = useState(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const resultRef = useRef<HTMLCanvasElement | null>(null);
@@ -130,7 +134,8 @@ function WordArtPanel() {
 	}, [debouncedText, style]);
 
 	const copy = () => {
-		resultRef.current?.toBlob(async (blob) => {
+		if (!resultRef.current) return;
+		withBackground(resultRef.current, background).toBlob(async (blob) => {
 			if (!blob) return;
 			try {
 				await navigator.clipboard.write([
@@ -147,13 +152,16 @@ function WordArtPanel() {
 	return (
 		<Card className="mt-2">
 			<CardContent className="flex flex-col gap-5">
-				<Input
-					value={text}
-					onChange={(e) => setText(e.target.value)}
-					placeholder="Your Text Here"
-					aria-label="Word Art text"
-					className="h-11 text-base"
-				/>
+				<div className="flex flex-wrap items-center gap-4">
+					<Input
+						value={text}
+						onChange={(e) => setText(e.target.value)}
+						placeholder="Your Text Here"
+						aria-label="Word Art text"
+						className="h-11 min-w-56 flex-1 text-base"
+					/>
+					<BackgroundPicker value={background} onChange={setBackground} />
+				</div>
 				<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
 					{WORDART_STYLES.map((s) => (
 						<StyleSwatch
@@ -167,8 +175,9 @@ function WordArtPanel() {
 				<div
 					className={cn(
 						"flex items-center justify-center overflow-hidden rounded-xl border p-6",
-						CHECKERBOARD,
+						background === null && CHECKERBOARD,
 					)}
+					style={background ? { backgroundColor: background } : undefined}
 				>
 					<canvas
 						ref={canvasRef}
@@ -179,7 +188,8 @@ function WordArtPanel() {
 				<div className="flex items-center gap-2">
 					<Button
 						onClick={() =>
-							resultRef.current?.toBlob(
+							resultRef.current &&
+							withBackground(resultRef.current, background).toBlob(
 								(blob) => blob && downloadBlob(blob, "wordart.png"),
 								"image/png",
 							)
@@ -201,6 +211,7 @@ function WordArtPanel() {
 function BurningPanel() {
 	const [text, setText] = useState("on fire");
 	const [cooling, setCooling] = useState(7);
+	const [background, setBackground] = useState<string | null>(null);
 	const [encoding, setEncoding] = useState(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const debouncedText = useDebounced(text, 200);
@@ -245,7 +256,11 @@ function BurningPanel() {
 					debouncedText || "on fire",
 				);
 				const sim = createFireSim(mask, outline, width, height);
-				const bytes = encodeFireGif(sim, cooling);
+				const bytes = encodeFireGif(
+					sim,
+					cooling,
+					background ? hexToRgb(background) : null,
+				);
 				downloadBlob(
 					new Blob([bytes as BlobPart], { type: "image/gif" }),
 					"burning-text.gif",
@@ -259,7 +274,8 @@ function BurningPanel() {
 	};
 
 	const exportPng = () => {
-		canvasRef.current?.toBlob(
+		if (!canvasRef.current) return;
+		withBackground(canvasRef.current, background).toBlob(
 			(blob) => blob && downloadBlob(blob, "burning-text.png"),
 			"image/png",
 		);
@@ -268,15 +284,15 @@ function BurningPanel() {
 	return (
 		<Card className="mt-2">
 			<CardContent className="flex flex-col gap-5">
-				<div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_14rem]">
+				<div className="flex flex-wrap items-center gap-4">
 					<Input
 						value={text}
 						onChange={(e) => setText(e.target.value)}
 						placeholder="on fire"
 						aria-label="Burning text"
-						className="h-11 text-base"
+						className="h-11 min-w-48 flex-1 text-base"
 					/>
-					<div>
+					<div className="w-48">
 						<div className="flex items-baseline justify-between">
 							<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
 								Flame height
@@ -294,9 +310,14 @@ function BurningPanel() {
 							}
 						/>
 					</div>
+					<BackgroundPicker value={background} onChange={setBackground} />
 				</div>
 				<div
-					className={cn("overflow-hidden rounded-xl border p-4", CHECKERBOARD)}
+					className={cn(
+						"overflow-hidden rounded-xl border p-4",
+						background === null && CHECKERBOARD,
+					)}
+					style={background ? { backgroundColor: background } : undefined}
 				>
 					<canvas
 						ref={canvasRef}

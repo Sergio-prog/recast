@@ -6,6 +6,11 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+	BackgroundPicker,
+	CHECKERBOARD,
+	withBackground,
+} from "@/components/background-picker";
 import { Dropzone } from "@/components/dropzone";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -18,13 +23,11 @@ export const Route = createFileRoute("/removebg")({
 	component: RemoveBgPage,
 });
 
-const CHECKERBOARD =
-	"bg-[linear-gradient(45deg,var(--color-muted)_25%,transparent_25%,transparent_75%,var(--color-muted)_75%),linear-gradient(45deg,var(--color-muted)_25%,transparent_25%,transparent_75%,var(--color-muted)_75%)] bg-[size:16px_16px] bg-[position:0_0,8px_8px]";
-
 function RemoveBgPage() {
 	const [file, setFile] = useState<File | null>(null);
 	const [originalUrl, setOriginalUrl] = useState<string | null>(null);
 	const [resultUrl, setResultUrl] = useState<string | null>(null);
+	const [background, setBackground] = useState<string | null>(null);
 	const [busy, setBusy] = useState(false);
 	const [download, setDownload] = useState<number | null>(null);
 	const requestId = useRef(0);
@@ -99,10 +102,26 @@ function RemoveBgPage() {
 
 	const saveResult = () => {
 		if (!resultUrl || !file) return;
-		const a = document.createElement("a");
-		a.href = resultUrl;
-		a.download = `${file.name.replace(/\.[^.]+$/, "")}-nobg.png`;
-		a.click();
+		const filename = `${file.name.replace(/\.[^.]+$/, "")}-nobg.png`;
+		if (!background) {
+			const a = document.createElement("a");
+			a.href = resultUrl;
+			a.download = filename;
+			a.click();
+			return;
+		}
+		const img = new Image();
+		img.onload = () => {
+			withBackground(img, background).toBlob((blob) => {
+				if (!blob) return;
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = filename;
+				a.click();
+				URL.revokeObjectURL(a.href);
+			}, "image/png");
+		};
+		img.src = resultUrl;
 	};
 
 	return (
@@ -111,7 +130,7 @@ function RemoveBgPage() {
 				Studio · Remove background
 			</p>
 			<h1 className="mt-3 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-				Cut the background, keep the subject.
+				Background remover
 			</h1>
 			<p className="mt-4 max-w-xl text-muted-foreground">
 				A segmentation model that runs entirely in your browser — the image
@@ -130,15 +149,18 @@ function RemoveBgPage() {
 				/>
 			) : (
 				<div className="mt-8 flex flex-col gap-5">
-					<div className="flex flex-wrap items-center justify-end gap-2">
-						<Button variant="outline" onClick={reset}>
-							<ArrowCounterClockwiseIcon />
-							New image
-						</Button>
-						<Button onClick={saveResult} disabled={!resultUrl || busy}>
-							<DownloadSimpleIcon />
-							Download PNG
-						</Button>
+					<div className="flex flex-wrap items-center justify-between gap-3">
+						<BackgroundPicker value={background} onChange={setBackground} />
+						<div className="flex items-center gap-2">
+							<Button variant="outline" onClick={reset}>
+								<ArrowCounterClockwiseIcon />
+								New image
+							</Button>
+							<Button onClick={saveResult} disabled={!resultUrl || busy}>
+								<DownloadSimpleIcon />
+								Download PNG
+							</Button>
+						</div>
 					</div>
 					<div className="grid gap-4 sm:grid-cols-2">
 						<figure>
@@ -163,8 +185,11 @@ function RemoveBgPage() {
 							<div
 								className={cn(
 									"mt-2 flex min-h-40 items-center justify-center overflow-hidden rounded-xl border",
-									CHECKERBOARD,
+									background === null && CHECKERBOARD,
 								)}
+								style={
+									background ? { backgroundColor: background } : undefined
+								}
 							>
 								{busy ? (
 									<div className="flex w-full max-w-56 flex-col items-center gap-3 p-6">
