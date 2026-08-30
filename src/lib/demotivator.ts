@@ -1,5 +1,19 @@
 export type LineKind = "caption" | "subcaption";
 
+export type DemotivatorFontId =
+	| "classic"
+	| "georgia"
+	| "baskerville"
+	| "palatino"
+	| "arial"
+	| "courier";
+
+export type DemotivatorFont = {
+	id: DemotivatorFontId;
+	label: string;
+	family: string;
+};
+
 export type DemotivatorLine = {
 	text: string;
 	scale: number;
@@ -62,6 +76,7 @@ export type RenderOptions = {
 	editorChrome?: boolean;
 	hideLine?: { frameId: string; line: LineKind } | null;
 	aspect?: number | null;
+	fontId?: DemotivatorFontId;
 };
 
 export const ASPECT_PRESETS: Array<{
@@ -82,7 +97,50 @@ export const CAPTION_SCALE = 0.09;
 export const SUBCAPTION_SCALE = 0.035;
 export const MAX_SOURCE_SIZE = 1000;
 
-export const DEMOTIVATOR_FONT = '"Times New Roman", Times, Georgia, serif';
+export const DEFAULT_DEMOTIVATOR_FONT_ID: DemotivatorFontId = "classic";
+
+export const DEMOTIVATOR_FONTS: Array<DemotivatorFont> = [
+	{
+		id: "classic",
+		label: "Classic Times",
+		family: '"Tinos", "Times New Roman", Times, serif',
+	},
+	{
+		id: "georgia",
+		label: "Georgia",
+		family: 'Georgia, "Times New Roman", serif',
+	},
+	{
+		id: "baskerville",
+		label: "Baskerville",
+		family: 'Baskerville, "Baskerville Old Face", "Hoefler Text", serif',
+	},
+	{
+		id: "palatino",
+		label: "Palatino",
+		family: '"Palatino Linotype", Palatino, "Book Antiqua", serif',
+	},
+	{
+		id: "arial",
+		label: "Arial",
+		family: "Arial, Helvetica, sans-serif",
+	},
+	{
+		id: "courier",
+		label: "Courier",
+		family: '"Courier New", Courier, monospace',
+	},
+];
+
+export function getDemotivatorFont(
+	fontId: DemotivatorFontId = DEFAULT_DEMOTIVATOR_FONT_ID,
+): DemotivatorFont {
+	return (
+		DEMOTIVATOR_FONTS.find((font) => font.id === fontId) ?? DEMOTIVATOR_FONTS[0]
+	);
+}
+
+export const DEMOTIVATOR_FONT = getDemotivatorFont().family;
 
 export const PLACEHOLDER_TEXT: Record<LineKind, string> = {
 	caption: "Caption",
@@ -190,8 +248,9 @@ function paintFrame(
 	const canvas = document.createElement("canvas");
 	const ctx = canvas.getContext("2d");
 	if (!ctx) throw new Error("Canvas is not available");
+	const fontFamily = getDemotivatorFont(options.fontId).family;
 	const measure: MeasureText = (text, fontPx) => {
-		ctx.font = `${fontPx}px ${DEMOTIVATOR_FONT}`;
+		ctx.font = `${fontPx}px ${fontFamily}`;
 		return ctx.measureText(text).width;
 	};
 	const metrics = frameMetrics(
@@ -217,7 +276,7 @@ function paintFrame(
 	);
 
 	ctx.textAlign = "center";
-	ctx.textBaseline = "top";
+	ctx.textBaseline = "middle";
 	const hits: Array<TextHit> = [];
 	for (const line of metrics.textLines) {
 		hits.push({
@@ -247,12 +306,13 @@ function paintFrame(
 			options.hideLine?.line === line.kind;
 		if (hidden) continue;
 		ctx.fillStyle = line.ghost ? "rgba(255,255,255,0.28)" : "#ffffff";
-		ctx.font = `${line.fontPx}px ${DEMOTIVATOR_FONT}`;
+		ctx.font = `${line.fontPx}px ${fontFamily}`;
+		const lineHeight = lineHeightFor(line.fontPx);
 		line.lines.forEach((row, index) => {
 			ctx.fillText(
 				row,
 				metrics.width / 2,
-				line.top + index * lineHeightFor(line.fontPx),
+				line.top + lineHeight * (index + 0.5),
 			);
 		});
 	}

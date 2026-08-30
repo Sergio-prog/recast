@@ -11,13 +11,25 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
 	ASPECT_PRESETS,
 	CAPTION_SCALE,
+	DEFAULT_DEMOTIVATOR_FONT_ID,
 	DEMOTIVATOR_FONT,
+	DEMOTIVATOR_FONTS,
+	type DemotivatorFontId,
 	type DemotivatorFrame,
+	getDemotivatorFont,
 	type LineKind,
+	lineHeightFor,
 	MAX_TEXT_SCALE,
 	MIN_TEXT_SCALE,
 	renderDemotivator,
@@ -62,11 +74,15 @@ function DemotivatorPage() {
 	const [frames, setFrames] = useState<Array<DemotivatorFrame>>(initialFrames);
 	const [selected, setSelected] = useState<Selection | null>(null);
 	const [aspectId, setAspectId] = useState("auto");
+	const [fontId, setFontId] = useState<DemotivatorFontId>(
+		DEFAULT_DEMOTIVATOR_FONT_ID,
+	);
+	const [fontsReady, setFontsReady] = useState(false);
 	const [exportSize, setExportSize] = useState<[number, number] | null>(null);
 	const [copied, setCopied] = useState(false);
 	const [displayScale, setDisplayScale] = useState(1);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const hitsRef = useRef<Array<TextHit>>([]);
 	const resizeStart = useRef<{
 		clientY: number;
@@ -76,13 +92,13 @@ function DemotivatorPage() {
 
 	const aspect =
 		ASPECT_PRESETS.find((preset) => preset.id === aspectId)?.value ?? null;
+	const selectedFont = getDemotivatorFont(fontId);
 	const selectedFrame = selected
 		? frames.find((frame) => frame.id === selected.frameId)
 		: null;
 	const selectedHit = selected
 		? hitsRef.current.find(
-				(hit) =>
-					hit.frameId === selected.frameId && hit.line === selected.line,
+				(hit) => hit.frameId === selected.frameId && hit.line === selected.line,
 			)
 		: null;
 
@@ -106,22 +122,27 @@ function DemotivatorPage() {
 	};
 
 	useEffect(() => {
+		void document.fonts.ready.then(() => setFontsReady(true));
+	}, []);
+
+	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (!canvas || !image) return;
+		if (!canvas || !image || !fontsReady) return;
 		const preview = renderDemotivator(image.el, frames, {
 			placeholders: true,
 			editorChrome: true,
 			hideLine: selected,
 			aspect,
+			fontId,
 		});
 		hitsRef.current = preview.hits;
 		canvas.width = preview.canvas.width;
 		canvas.height = preview.canvas.height;
 		canvas.getContext("2d")?.drawImage(preview.canvas, 0, 0);
 		setDisplayScale(canvas.clientWidth / canvas.width || 1);
-		const output = renderDemotivator(image.el, frames, { aspect });
+		const output = renderDemotivator(image.el, frames, { aspect, fontId });
 		setExportSize([output.canvas.width, output.canvas.height]);
-	}, [image, frames, selected, aspect]);
+	}, [image, frames, selected, aspect, fontId, fontsReady]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -200,7 +221,7 @@ function DemotivatorPage() {
 
 	const exportCanvas = () => {
 		if (!image) return null;
-		return renderDemotivator(image.el, frames, { aspect }).canvas;
+		return renderDemotivator(image.el, frames, { aspect, fontId }).canvas;
 	};
 
 	const download = () => {
@@ -265,7 +286,7 @@ function DemotivatorPage() {
 				)}
 			</div>
 			<div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
 						Ratio
 					</span>
@@ -290,6 +311,32 @@ function DemotivatorPage() {
 							</ToggleGroupItem>
 						))}
 					</ToggleGroup>
+					<span className="ml-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+						Font
+					</span>
+					<Select
+						value={fontId}
+						onValueChange={(value) => {
+							if (value) setFontId(value as DemotivatorFontId);
+						}}
+					>
+						<SelectTrigger size="sm" className="min-w-36">
+							<SelectValue style={{ fontFamily: selectedFont.family }}>
+								{selectedFont.label}
+							</SelectValue>
+						</SelectTrigger>
+						<SelectContent align="start">
+							{DEMOTIVATOR_FONTS.map((font) => (
+								<SelectItem
+									key={font.id}
+									value={font.id}
+									style={{ fontFamily: font.family }}
+								>
+									{font.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</div>
 				<div className="flex items-center gap-1.5">
 					<Button variant="outline" size="sm" onClick={addLoop}>
@@ -312,6 +359,7 @@ function DemotivatorPage() {
 							setImage(null);
 							setSelected(null);
 							setAspectId("auto");
+							setFontId(DEFAULT_DEMOTIVATOR_FONT_ID);
 							setFrames(initialFrames());
 						}}
 					>
@@ -336,12 +384,12 @@ function DemotivatorPage() {
 					</Button>
 				</div>
 			</div>
-			<div className="mt-3 rounded-xl border bg-black/95 p-3">
+			<div className="mt-3 rounded-xl border bg-muted/80 p-3 dark:bg-muted/50">
 				<div className="relative mx-auto w-fit max-w-full">
 					<canvas
 						ref={canvasRef}
 						onClick={handleCanvasClick}
-						className="block h-auto max-h-[calc(100svh-16rem)] w-auto max-w-full cursor-text"
+						className="block h-auto max-h-[calc(100svh-16rem)] w-auto max-w-full cursor-text ring-1 ring-white shadow-[0_0_0_2px_rgba(0,0,0,0.32)]"
 						aria-label="Demotivator canvas — click a caption to edit it"
 					/>
 					{selected && selectedFrame && selectedHit && (
@@ -354,7 +402,7 @@ function DemotivatorPage() {
 								height: selectedHit.height * displayScale,
 							}}
 						>
-							<input
+							<textarea
 								ref={inputRef}
 								value={selectedFrame[selected.line].text}
 								onChange={(e) => updateLine(selected, { text: e.target.value })}
@@ -366,9 +414,11 @@ function DemotivatorPage() {
 								onBlur={(e) => {
 									if (
 										!e.relatedTarget ||
-										!(e.currentTarget.parentElement?.contains(
-											e.relatedTarget,
-										) ?? false)
+										!(
+											e.currentTarget.parentElement?.contains(
+												e.relatedTarget,
+											) ?? false
+										)
 									) {
 										setSelected(null);
 									}
@@ -378,10 +428,11 @@ function DemotivatorPage() {
 								}
 								aria-label="Edit caption"
 								spellCheck={false}
-								className="size-full border border-dashed border-white/80 bg-transparent text-center text-white caret-white outline-none placeholder:text-white/30"
+								className="block size-full resize-none overflow-hidden border-0 bg-transparent p-0 text-center text-white caret-white outline-1 -outline-offset-1 outline-dashed outline-white/85 placeholder:text-white/30"
 								style={{
-									fontFamily: DEMOTIVATOR_FONT,
+									fontFamily: selectedFont.family,
 									fontSize: selectedHit.fontPx * displayScale,
+									lineHeight: `${lineHeightFor(selectedHit.fontPx) * displayScale}px`,
 								}}
 							/>
 							<button
@@ -411,8 +462,8 @@ function DemotivatorPage() {
 				</div>
 			</div>
 			<p className="mt-2 text-xs text-muted-foreground">
-				The dashed boxes are editable — click one to type, drag the white
-				corner handle to resize. Empty captions are skipped in the export.
+				The dashed boxes are editable — click one to type, drag the white corner
+				handle to resize. Empty captions are skipped in the export.
 			</p>
 		</main>
 	);

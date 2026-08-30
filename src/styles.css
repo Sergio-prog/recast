@@ -5,6 +5,9 @@
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/spline-sans-mono";
+@import "@fontsource/tinos/latin-400.css";
+@import "@fontsource/tinos/cyrillic-400.css";
+@import "@fontsource/tinos/cyrillic-ext-400.css";
 
 @custom-variant dark (&:is(.dark *));
 
