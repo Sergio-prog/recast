@@ -40,6 +40,37 @@ const MIN_STAGE_HEIGHT = 320;
 const RESERVED_VIEWPORT_HEIGHT = 250;
 const FIXED_VIEWPORT_QUERY = "(min-width: 64rem)";
 const TAB = "  ";
+const RUBBER_BAND_LIMIT = 20;
+const RUBBER_BAND_STIFFNESS = 0.55;
+
+const rubberBand = (overshoot: number) =>
+	RUBBER_BAND_LIMIT *
+	(1 - 1 / ((overshoot * RUBBER_BAND_STIFFNESS) / RUBBER_BAND_LIMIT + 1));
+
+const overshootSqueeze = (requested: number, contentWidth: number) => {
+	if (requested < contentWidth) return rubberBand(contentWidth - requested);
+	if (requested > LIMITS.windowWidth.max)
+		return -rubberBand(requested - LIMITS.windowWidth.max);
+	return 0;
+};
+
+const squeezeLayout = (
+	layout: Layout,
+	squeeze: number,
+	titleFollowsEdge: boolean,
+): Layout => ({
+	...layout,
+	window: {
+		...layout.window,
+		x: layout.window.x + squeeze / 2,
+		width: layout.window.width - squeeze,
+	},
+	title: {
+		...layout.title,
+		x: layout.title.x - (titleFollowsEdge ? 0 : squeeze / 2),
+	},
+	code: { ...layout.code, x: layout.code.x - squeeze / 2 },
+});
 
 const SMOOTH =
 	"transition-[width,height,transform,translate,opacity,border-radius,background-color,box-shadow,backdrop-filter] duration-[380ms] ease-out-expo motion-reduce:transition-[opacity,background-color]";
@@ -74,6 +105,7 @@ export function Stage({
 		null,
 	);
 	const [dropping, setDropping] = useState(false);
+	const [squeeze, setSqueeze] = useState(0);
 
 	useEffect(() => {
 		const viewport = viewportRef.current;
@@ -154,7 +186,7 @@ export function Stage({
 				>
 					<div
 						className={cn(
-							"relative origin-top-left overflow-hidden",
+							"group/frame relative origin-top-left overflow-hidden",
 							transition,
 						)}
 						style={{
@@ -166,7 +198,11 @@ export function Stage({
 						<BackdropLayers background={background} />
 						<CodeWindow
 							settings={settings}
-							layout={layout}
+							layout={squeezeLayout(
+								layout,
+								squeeze,
+								settings.windowStyle === "windows",
+							)}
 							lines={lines}
 							theme={theme}
 							transition={transition}
@@ -176,9 +212,11 @@ export function Stage({
 						<ResizeHandles
 							layout={layout}
 							scale={scale}
-							custom={settings.windowWidth !== null}
+							squeeze={squeeze}
+							requestedWidth={settings.windowWidth}
 							transition={transition}
 							onWindowWidth={onWindowWidth}
+							onSqueeze={setSqueeze}
 						/>
 					</div>
 				</div>
@@ -193,29 +231,42 @@ const positionKeyed = (lines: Array<Array<CodeToken>>) =>
 		tokens: tokens.map((token, column) => ({ key: `token-${column}`, token })),
 	}));
 
-type Layer = { key: string; url: string | null };
+type Layer = { key: string; url: string | null; fadesIn: boolean };
+
+const MAX_BACKDROP_LAYERS = 3;
 
 function BackdropLayers({ background }: { background: Background | null }) {
-	const current: Layer = {
-		key: background?.url ?? "none",
-		url: background?.url ?? null,
-	};
-	const [layers, setLayers] = useState<Array<Layer>>([current]);
-	if (layers[layers.length - 1].key !== current.key) {
+	const currentKey = background?.url ?? "none";
+	const [layers, setLayers] = useState<Array<Layer>>([
+		{ key: currentKey, url: background?.url ?? null, fadesIn: false },
+	]);
+	if (!layers.some((layer) => layer.key === currentKey)) {
 		setLayers([
-			...layers.filter((layer) => layer.key !== current.key).slice(-2),
-			current,
+			...layers.slice(1 - MAX_BACKDROP_LAYERS),
+			{ key: currentKey, url: background?.url ?? null, fadesIn: true },
 		]);
 	}
+	const activeIndex = layers.findIndex((layer) => layer.key === currentKey);
+
+	const settle = (key: string) =>
+		setLayers((stack) => {
+			const settled = stack.findIndex((layer) => layer.key === key);
+			const active = stack.findIndex((layer) => layer.key === currentKey);
+			if (settled > active) return stack.filter((layer) => layer.key !== key);
+			if (settled === active) return stack.slice(active);
+			return stack;
+		});
+
 	return layers.map((layer, index) => (
 		<div
 			key={layer.key}
-			onAnimationEnd={() => {
-				if (index === layers.length - 1) setLayers([layer]);
+			onTransitionEnd={(e) => {
+				if (e.propertyName === "opacity") settle(layer.key);
 			}}
 			className={cn(
-				"absolute inset-0 bg-cover bg-center",
-				index > 0 && "animate-layer-in",
+				"absolute inset-0 bg-cover bg-center transition-opacity duration-[450ms] ease-out",
+				layer.fadesIn && "starting:opacity-0",
+				index > activeIndex && "opacity-0 duration-[250ms]",
 				!layer.url && ["bg-background", CHECKERBOARD],
 			)}
 			style={layer.url ? { backgroundImage: `url("${layer.url}")` } : undefined}
@@ -358,17 +409,23 @@ const SIDES = ["left", "right"] as const;
 function ResizeHandles({
 	layout,
 	scale,
-	custom,
+	squeeze,
+	requestedWidth,
 	transition,
 	onWindowWidth,
+	onSqueeze,
 }: Pick<StageProps, "layout" | "onWindowWidth"> & {
 	scale: number;
-	custom: boolean;
+	squeeze: number;
+	requestedWidth: number | null;
 	transition: string;
+	onSqueeze: (squeeze: number) => void;
 }) {
 	const drag = useRef<{ startX: number; startWidth: number } | null>(null);
 	const [dragging, setDragging] = useState(false);
-	const { x, y, width, height } = layout.window;
+	const { y, height } = layout.window;
+	const x = layout.window.x + squeeze / 2;
+	const width = layout.window.width - squeeze;
 
 	const resizeTo = (requested: number) =>
 		onWindowWidth(
@@ -376,8 +433,11 @@ function ResizeHandles({
 			"instant",
 		);
 	const release = () => {
+		if (!drag.current) return;
 		drag.current = null;
 		setDragging(false);
+		onSqueeze(0);
+		onWindowWidth(requestedWidth, "smooth");
 	};
 
 	return (
@@ -394,13 +454,19 @@ function ResizeHandles({
 							if (e.button !== 0) return;
 							e.preventDefault();
 							e.currentTarget.setPointerCapture(e.pointerId);
-							drag.current = { startX: e.clientX, startWidth: width };
+							drag.current = {
+								startX: e.clientX,
+								startWidth: layout.window.width,
+							};
 							setDragging(true);
 						}}
 						onPointerMove={(e) => {
 							if (!drag.current) return;
 							const travelled = (e.clientX - drag.current.startX) / scale;
-							resizeTo(drag.current.startWidth + travelled * direction * 2);
+							const requested =
+								drag.current.startWidth + travelled * direction * 2;
+							onSqueeze(overshootSqueeze(requested, layout.contentWidth));
+							resizeTo(requested);
 						}}
 						onPointerUp={release}
 						onPointerCancel={release}
@@ -412,7 +478,7 @@ function ResizeHandles({
 								resizeTo(
 									Math.min(
 										LIMITS.windowWidth.max,
-										width + step * KEYBOARD_RESIZE_STEP,
+										layout.window.width + step * KEYBOARD_RESIZE_STEP,
 									),
 								);
 							}
@@ -449,7 +515,7 @@ function ResizeHandles({
 				}}
 			>
 				<span className="rounded-full bg-black/65 px-2 font-mono text-[10px] leading-[18px] text-white tabular-nums backdrop-blur-sm">
-					{custom ? `${width}px` : "Auto"}
+					{requestedWidth === null ? "Auto" : `${layout.window.width}px`}
 				</span>
 			</span>
 		</>
