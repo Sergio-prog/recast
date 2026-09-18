@@ -17,7 +17,9 @@ type Bundle = {
 
 let bundlePromise: Promise<Bundle> | null = null;
 
-function loadModel(onProgress: (progress: ModelProgress) => void): Promise<Bundle> {
+function loadModel(
+	onProgress: (progress: ModelProgress) => void,
+): Promise<Bundle> {
 	bundlePromise ??= (async () => {
 		const transformers = await import("@huggingface/transformers");
 		const model = await transformers.AutoModel.from_pretrained(MODEL_ID, {

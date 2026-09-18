@@ -55,6 +55,9 @@
   client-side
 - **Word Art** — six retro text styles plus a burning-text generator with
   transparent animated GIF export. Fully client-side
+- **Code image** — code on a frosted glass window over a gradient or your own
+  image: 24 Shiki themes, 28 languages, window styles, aspect ratios, PNG export
+  up to 4x. Fully client-side
 - **Remove background** — segmentation model (RMBG-1.4 via transformers.js)
   running entirely in the browser; transparent PNG out, nothing uploaded
 - **Paste** — link-only or private pastes with tags, description and expiry;

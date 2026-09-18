@@ -2,6 +2,7 @@ import {
 	ArrowRightIcon,
 	CameraIcon,
 	ClipboardTextIcon,
+	CodeBlockIcon,
 	CurrencyCircleDollarIcon,
 	DownloadSimpleIcon,
 	EyeIcon,
@@ -70,7 +71,8 @@ const TOOL_GROUPS: Array<{ label: string; blurb: string; tools: Array<Tool> }> =
 		},
 		{
 			label: "Studio",
-			blurb: "Make things — memes, retro text effects and clean cutouts.",
+			blurb:
+				"Make things — memes, retro text effects, code images and clean cutouts.",
 			tools: [
 				{
 					to: "/demotivator",
@@ -87,10 +89,16 @@ const TOOL_GROUPS: Array<{ label: string; blurb: string; tools: Array<Tool> }> =
 					icon: MagicWandIcon,
 				},
 				{
+					to: "/code-image",
+					label: "Code image",
+					blurb:
+						"Code on a frosted window over any background, saved as a PNG.",
+					icon: CodeBlockIcon,
+				},
+				{
 					to: "/removebg",
 					label: "Remove background",
-					blurb:
-						"AI cutout to transparent PNG — runs fully in your browser.",
+					blurb: "AI cutout to transparent PNG — runs fully in your browser.",
 					icon: SelectionBackgroundIcon,
 				},
 			],
@@ -135,7 +143,8 @@ const TOOL_GROUPS: Array<{ label: string; blurb: string; tools: Array<Tool> }> =
 		},
 		{
 			label: "Text",
-			blurb: "Paste, count and transform text — all client-side where possible.",
+			blurb:
+				"Paste, count and transform text — all client-side where possible.",
 			tools: [
 				{
 					to: "/paste",
@@ -146,7 +155,8 @@ const TOOL_GROUPS: Array<{ label: string; blurb: string; tools: Array<Tool> }> =
 				{
 					to: "/tokenizer",
 					label: "Tokenizer",
-					blurb: "Count GPT, Claude or Gemini tokens and see every token piece.",
+					blurb:
+						"Count GPT, Claude or Gemini tokens and see every token piece.",
 					icon: TextAaIcon,
 				},
 				{

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
 	frameMetrics,
-	type MeasureText,
 	type MeasuredLine,
+	type MeasureText,
 	measuredLines,
 	wrapLines,
 } from "./demotivator";
