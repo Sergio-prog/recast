@@ -187,9 +187,7 @@ function RemoveBgPage() {
 									"mt-2 flex min-h-40 items-center justify-center overflow-hidden rounded-xl border",
 									background === null && CHECKERBOARD,
 								)}
-								style={
-									background ? { backgroundColor: background } : undefined
-								}
+								style={background ? { backgroundColor: background } : undefined}
 							>
 								{busy ? (
 									<div className="flex w-full max-w-56 flex-col items-center gap-3 p-6">

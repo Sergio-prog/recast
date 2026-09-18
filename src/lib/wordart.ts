@@ -200,7 +200,8 @@ function distortCanvas(
 		const t = x / flat.width;
 		const scale = columnScale(distort, t);
 		const height = flat.height * scale;
-		const y = extra + columnShift(distort, t, flat.height) + (flat.height - height) / 2;
+		const y =
+			extra + columnShift(distort, t, flat.height) + (flat.height - height) / 2;
 		ctx.drawImage(flat, x, 0, 1, flat.height, x, y, 1, height);
 	}
 	return canvas;

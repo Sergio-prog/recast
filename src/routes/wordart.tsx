@@ -27,8 +27,12 @@ import {
 	stepFire,
 	textMask,
 } from "@/lib/burning-text";
-import { renderWordArt, WORDART_STYLES, type WordArtStyle } from "@/lib/wordart";
 import { cn } from "@/lib/utils";
+import {
+	renderWordArt,
+	WORDART_STYLES,
+	type WordArtStyle,
+} from "@/lib/wordart";
 
 export const Route = createFileRoute("/wordart")({
 	head: () => ({ meta: [{ title: "Word Art — Recast" }] }),
