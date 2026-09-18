@@ -24,6 +24,7 @@ import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DigRouteImport } from './routes/dig'
 import { Route as DemotivatorRouteImport } from './routes/demotivator'
 import { Route as CurrencyRouteImport } from './routes/currency'
+import { Route as CodeImageRouteImport } from './routes/code-image'
 import { Route as AudioRouteImport } from './routes/audio'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PasteIndexRouteImport } from './routes/paste/index'
@@ -115,6 +116,11 @@ const CurrencyRoute = CurrencyRouteImport.update({
   path: '/currency',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CodeImageRoute = CodeImageRouteImport.update({
+  id: '/code-image',
+  path: '/code-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AudioRoute = AudioRouteImport.update({
   id: '/audio',
   path: '/audio',
@@ -194,6 +200,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
+  '/code-image': typeof CodeImageRoute
   '/currency': typeof CurrencyRoute
   '/demotivator': typeof DemotivatorRoute
   '/dig': typeof DigRoute
@@ -226,6 +233,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
+  '/code-image': typeof CodeImageRoute
   '/currency': typeof CurrencyRoute
   '/demotivator': typeof DemotivatorRoute
   '/dig': typeof DigRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/audio': typeof AudioRoute
+  '/code-image': typeof CodeImageRoute
   '/currency': typeof CurrencyRoute
   '/demotivator': typeof DemotivatorRoute
   '/dig': typeof DigRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/audio'
+    | '/code-image'
     | '/currency'
     | '/demotivator'
     | '/dig'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/audio'
+    | '/code-image'
     | '/currency'
     | '/demotivator'
     | '/dig'
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/audio'
+    | '/code-image'
     | '/currency'
     | '/demotivator'
     | '/dig'
@@ -390,6 +402,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AudioRoute: typeof AudioRoute
+  CodeImageRoute: typeof CodeImageRoute
   CurrencyRoute: typeof CurrencyRoute
   DemotivatorRoute: typeof DemotivatorRoute
   DigRoute: typeof DigRoute
@@ -526,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CurrencyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/code-image': {
+      id: '/code-image'
+      path: '/code-image'
+      fullPath: '/code-image'
+      preLoaderRoute: typeof CodeImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/audio': {
       id: '/audio'
       path: '/audio'
@@ -649,6 +669,7 @@ const ApiPasteRouteWithChildren = ApiPasteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AudioRoute: AudioRoute,
+  CodeImageRoute: CodeImageRoute,
   CurrencyRoute: CurrencyRoute,
   DemotivatorRoute: DemotivatorRoute,
   DigRoute: DigRoute,

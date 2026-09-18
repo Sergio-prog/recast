@@ -3,6 +3,7 @@ import {
 	CameraIcon,
 	CaretDownIcon,
 	ClipboardTextIcon,
+	CodeBlockIcon,
 	CurrencyCircleDollarIcon,
 	DownloadSimpleIcon,
 	EyeIcon,
@@ -150,6 +151,7 @@ const NAV_GROUPS: Array<{ label: string; items: Array<NavItem> }> = [
 		items: [
 			{ to: "/demotivator", label: "Demotivator", icon: FrameCornersIcon },
 			{ to: "/wordart", label: "Word Art", icon: MagicWandIcon },
+			{ to: "/code-image", label: "Code image", icon: CodeBlockIcon },
 			{
 				to: "/removebg",
 				label: "Remove background",
@@ -211,7 +213,8 @@ function NavMenu({ label, items }: { label: string; items: Array<NavItem> }) {
 function ConvertMenu() {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const active =
-		pathname === "/" || CONVERT_ITEMS.some((item) => pathname.startsWith(item.to));
+		pathname === "/" ||
+		CONVERT_ITEMS.some((item) => pathname.startsWith(item.to));
 	return (
 		<div
 			className={cn(
